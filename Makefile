@@ -1,5 +1,5 @@
 TARGET := rombundler
-VERSION := devel
+VERSION ?= devel
 
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe

@@ -13,12 +13,6 @@
 #include <AL/alc.h>
 #endif
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
-
 #define BUFSIZE 1024*8
 #define NUMBUFFERS 4
 
