@@ -63,10 +63,18 @@ struct keymap g_binds[] = {
 
 static unsigned g_joy[RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
 
+#if defined(_WIN32)
+#define load_lib(L) LoadLibrary(L);
+#define load_sym(V, S) ((*(void**)&V) = GetProcAddress(g_retro.handle, #S))
+#define close_lib(L) //(L)
+#else
 #define load_sym(V, S) do {\
 	if (!((*(void**)&V) = dlsym(g_retro.handle, #S))) \
 		die("Failed to load symbol '" #S "'': %s", dlerror()); \
 	} while (0)
+#define load_lib(L) dlopen(L, RTLD_LAZY);
+#define close_lib(L) dlclose(L);
+#endif
 #define load_retro_sym(S) load_sym(g_retro.S, S)
 
 static void error_cb(int error, const char* description)
@@ -164,12 +172,10 @@ static void core_load(const char *sofile) {
 	void (*set_audio_sample_batch)(retro_audio_sample_batch_t) = NULL;
 
 	memset(&g_retro, 0, sizeof(g_retro));
-	g_retro.handle = dlopen(sofile, RTLD_LAZY);
+	g_retro.handle = load_lib(sofile);
 
 	if (!g_retro.handle)
-		die("Failed to load core: %s", dlerror());
-
-	dlerror();
+		die("Failed to load core");
 
 	load_retro_sym(retro_init);
 	load_retro_sym(retro_deinit);
@@ -241,7 +247,7 @@ static void core_unload() {
 		g_retro.retro_deinit();
 
 	if (g_retro.handle)
-		dlclose(g_retro.handle);
+		close_lib(g_retro.handle);
 }
 
 int main(int argc, char *argv[]) {
