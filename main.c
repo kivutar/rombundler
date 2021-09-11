@@ -3,8 +3,13 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <errno.h>
-#include <dlfcn.h>
 #include <string.h>
+
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
