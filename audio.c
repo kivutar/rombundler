@@ -18,12 +18,15 @@
 #include <unistd.h>
 #endif
 
-#define BUFSIZE 1024
-#define NUMBUFFERS 32
+#define BUFSIZE 1024*8
+#define NUMBUFFERS 4
 
 #ifndef MIN
 #define MIN(x,y)	((x) <= (y) ? (x) : (y))
 #endif
+
+#include "audio.h"
+#include "utils.h"
 
 typedef struct al
 {
@@ -63,7 +66,7 @@ static bool get_buffer(ALuint *buffer)
 			if (unqueue_buffers())
 				break;
 
-			sleep(1);
+			usleep(1);
 		}
 	}
 
@@ -80,7 +83,7 @@ static size_t fill_internal_buf(const void *buf, size_t size)
 }
 
 size_t audio_write(const void *buf_, unsigned size) {
-	if (buf_ == NULL || size == 0)
+	if (!al || !buf_ || !size)
 		return size;
 
 	const uint8_t *buf = (const uint8_t*)buf_;
@@ -147,11 +150,11 @@ void audio_init(int rate) {
 
 	al->handle = alcOpenDevice(NULL);
 	if (!al->handle)
-		goto error;
+		die("Could not init audio handle");
 
 	al->ctx = alcCreateContext(al->handle, NULL);
 	if (!al->ctx)
-		goto error;
+		die("Could not init audio context");
 
 	alcMakeContextCurrent(al->ctx);
 
@@ -159,14 +162,11 @@ void audio_init(int rate) {
 	al->buffers = (ALuint*)calloc(NUMBUFFERS, sizeof(ALuint));
 	al->res_buf = (ALuint*)calloc(NUMBUFFERS, sizeof(ALuint));
 	if (!al->buffers || !al->res_buf)
-		goto error;
+		die("Could not init audio buffers");
 
 	alGenSources(1, &al->source);
 	alGenBuffers(NUMBUFFERS, al->buffers);
 
 	memcpy(al->res_buf, al->buffers, NUMBUFFERS * sizeof(ALuint));
 	al->res_ptr = NUMBUFFERS;
-
-error:
-	audio_deinit();
 }
