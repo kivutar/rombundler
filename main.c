@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/time.h>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -24,6 +25,8 @@
 
 extern GLFWwindow *g_win;
 config g_cfg;
+static struct retro_frame_time_callback runloop_frame_time;
+static retro_usec_t runloop_frame_time_last = 0;
 
 static struct {
 	void *handle;
@@ -101,6 +104,12 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
 		exit(EXIT_FAILURE);
 }
 
+retro_time_t get_time_usec() {
+	struct timeval tv;
+	gettimeofday(&tv,NULL);
+	return tv.tv_sec*1000000ull+tv.tv_usec;
+}
+
 static bool core_environment(unsigned cmd, void *data) {
 	switch (cmd) {
 		case RETRO_ENVIRONMENT_GET_LOG_INTERFACE: {
@@ -109,7 +118,29 @@ static bool core_environment(unsigned cmd, void *data) {
 			break;
 		}
 		case RETRO_ENVIRONMENT_GET_CAN_DUPE: {
-			*(bool*)data = true;
+			bool *bval = (bool*)data;
+			*bval = true;
+			break;
+		}
+		case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE: {
+			bool *bval = (bool*)data;
+			*bval = false;
+			break;
+		}
+		case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE: {
+			int *value = (int*)data;
+			*value = 1 << 0 | 1 << 1;
+			break;
+		}
+		case RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK: {
+			const struct retro_frame_time_callback *frame_time =
+				(const struct retro_frame_time_callback*)data;
+			runloop_frame_time = *frame_time;
+			break;
+		}
+		case RETRO_ENVIRONMENT_GET_PERF_INTERFACE: {
+			struct retro_perf_callback *perf_cb = (struct retro_perf_callback*)data;
+			perf_cb->get_time_usec = get_time_usec;
 			break;
 		}
 		case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
@@ -263,6 +294,16 @@ int main(int argc, char *argv[]) {
 	core_load_game(g_cfg.rom);
 
 	while (!glfwWindowShouldClose(g_win)) {
+		if (runloop_frame_time.callback) {
+			retro_time_t current = get_time_usec();
+			retro_time_t delta = current - runloop_frame_time_last;
+
+			if (!runloop_frame_time_last)
+				delta = runloop_frame_time.reference;
+			runloop_frame_time_last = current;
+			runloop_frame_time.callback(delta * 1000);
+		}
+
 		glfwPollEvents();
 
 		g_retro.retro_run();
