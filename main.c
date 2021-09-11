@@ -126,7 +126,9 @@ static void create_window(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	g_win = glfwCreateWindow(width, height, "Title", NULL, NULL);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+
+	g_win = glfwCreateWindow(width, height, "Title", monitor, NULL);
 
 	if (!g_win)
 		die("Failed to create window.");
@@ -139,8 +141,6 @@ static void create_window(int width, int height) {
 		die("Failed to initialize glad");
 
 	glfwSwapInterval(1);
-
-	printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_TEXTURE_2D);
 
