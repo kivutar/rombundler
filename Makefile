@@ -6,6 +6,9 @@ OBJ = main.o glad.o audio.o ini.o
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+.PHONY: all clean
+
+all: rombundler
 rombundler: $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
