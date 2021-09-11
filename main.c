@@ -9,6 +9,10 @@ static void error_callback(int error, const char* description)
 	fprintf(stderr, "Error: %s\n", description);
 }
 
+static void resize_callback(GLFWwindow *win, int w, int h) {
+	glViewport(0, 0, w, h);
+}
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -18,7 +22,7 @@ int main(void)
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
-	window = glfwCreateWindow(640, 480, "Title", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "Title", NULL, NULL);
 
 	if (!window)
 	{
@@ -26,6 +30,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
+	glfwSetFramebufferSizeCallback(window, resize_callback);
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 	glfwSwapInterval(1);
