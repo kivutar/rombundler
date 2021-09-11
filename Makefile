@@ -1,7 +1,7 @@
 CFLAGS += -O3 -fPIC -flto -I. -I./include
 LDFLAGS += -lglfw -flto
 
-OBJ = main.o glad.o audio.o
+OBJ = main.o glad.o audio.o ini.o
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)

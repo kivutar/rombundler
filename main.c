@@ -9,6 +9,7 @@
 
 #include "libretro.h"
 #include "audio.h"
+#include "ini.h"
 
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
@@ -80,6 +81,15 @@ struct keymap g_binds[] = {
 
 static unsigned g_joy[RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
 
+typedef struct
+{
+	const char* title;
+    const char* core;
+    const char* rom;
+} config;
+
+config g_cfg;
+
 #define load_sym(V, S) do {\
 	if (!((*(void**)&V) = dlsym(g_retro.handle, #S))) \
 		die("Failed to load symbol '" #S "'': %s", dlerror()); \
@@ -128,7 +138,7 @@ static void create_window(int width, int height) {
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-	g_win = glfwCreateWindow(width, height, "Title", monitor, NULL);
+	g_win = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
 
 	if (!g_win)
 		die("Failed to create window.");
@@ -444,17 +454,33 @@ static void core_unload() {
 		dlclose(g_retro.handle);
 }
 
+static int ihandler(void* user, const char* section, const char* name, const char* value)
+{
+    config* pconfig = (config*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("", "title"))
+        pconfig->title = strdup(value);
+	else if (MATCH("", "core"))
+        pconfig->core = strdup(value);
+    else if (MATCH("", "rom"))
+        pconfig->rom = strdup(value);
+    else
+        return 0;
+    return 1;
+}
+
 int main(int argc, char *argv[]) {
-	if (argc < 3)
-		die("usage: %s <core> <game>", argv[0]);
+	if (ini_parse("config.ini", ihandler, &g_cfg) < 0)
+		die("Could not parse ini");
 
 	glfwSetErrorCallback(error_cb);
 
 	if (!glfwInit())
 		die("Failed to initialize GLFW");
 
-	core_load(argv[1]);
-	core_load_game(argv[2]);
+	core_load(g_cfg.core);
+	core_load_game(g_cfg.rom);
 
 	while (!glfwWindowShouldClose(g_win)) {
 		glfwPollEvents();
