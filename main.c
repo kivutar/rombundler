@@ -136,9 +136,9 @@ static void create_window(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-	g_win = glfwCreateWindow(width, height, g_cfg.title, NULL, NULL);
+	g_win = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
 
 	if (!g_win)
 		die("Failed to create window.");
