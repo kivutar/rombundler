@@ -14,7 +14,13 @@ Dependencies are:
  * OpenAL
  * OpenGL 2.1
 
+See our Github Action config files for detailed instructions on how to setup dependencies per OS.
+
+To compile:
+
+```
     make
+```
 
 # Usage
 
