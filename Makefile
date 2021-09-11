@@ -1,5 +1,5 @@
 CFLAGS += -O3 -fPIC -flto -I. -I./include
-LDFLAGS += -lglfw -flto
+LDFLAGS += -lglfw -framework OpenAL -flto
 
 OBJ = main.o glad.o audio.o ini.o
 
@@ -11,4 +11,3 @@ rombundler: $(OBJ)
 
 clean:
 	rm $(OBJ) rombundler
-

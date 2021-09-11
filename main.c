@@ -136,9 +136,9 @@ static void create_window(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-	g_win = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
+	g_win = glfwCreateWindow(width, height, g_cfg.title, NULL, NULL);
 
 	if (!g_win)
 		die("Failed to create window.");
@@ -358,11 +358,11 @@ static int16_t core_input_state(unsigned port, unsigned device, unsigned index, 
 
 static void core_audio_sample(int16_t left, int16_t right) {
 	int16_t buf[2] = {left, right};
-	audio_write(buf, 1);
+	audio_write(buf, 4);
 }
 
 static size_t core_audio_sample_batch(const int16_t *data, size_t frames) {
-	return audio_write(data, frames);
+	return audio_write(data, frames*4);
 }
 
 static void core_load(const char *sofile) {
