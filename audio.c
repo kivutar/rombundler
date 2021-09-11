@@ -38,7 +38,7 @@ typedef struct al
 	uint8_t tmpbuf[BUFSIZE];
 } al_t;
 
-al_t* al;
+al_t* al = NULL;
 
 static bool unqueue_buffers()
 {
@@ -80,6 +80,9 @@ static size_t fill_internal_buf(const void *buf, size_t size)
 }
 
 size_t audio_write(const void *buf_, unsigned size) {
+	if (buf_ == NULL || size == 0)
+		return size;
+
 	const uint8_t *buf = (const uint8_t*)buf_;
 	size_t written = 0;
 
@@ -149,7 +152,7 @@ void audio_init(int rate) {
 	al->ctx = alcCreateContext(al->handle, NULL);
 	if (!al->ctx)
 		goto error;
-	
+
 	alcMakeContextCurrent(al->ctx);
 
 	al->rate = rate;
