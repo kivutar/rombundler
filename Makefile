@@ -1,5 +1,5 @@
-CFLAGS += -O3 -fPIC -flto -I. -I./include
-LDFLAGS += -lglfw -framework OpenAL -flto
+CFLAGS += -Wall -O3 -fPIC -flto -I. -I./include
+LDFLAGS += -dl -lglfw -framework OpenAL -flto
 
 OBJ = main.o glad.o audio.o ini.o
 

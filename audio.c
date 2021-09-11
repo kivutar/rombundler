@@ -116,10 +116,31 @@ size_t audio_write(const void *buf_, unsigned size) {
 	return written;
 }
 
+void audio_deinit() {
+	if (!al)
+		return;
+
+	alSourceStop(al->source);
+	alDeleteSources(1, &al->source);
+
+	if (al->buffers)
+		alDeleteBuffers(NUMBUFFERS, al->buffers);
+
+	free(al->buffers);
+	free(al->res_buf);
+	alcMakeContextCurrent(NULL);
+
+	if (al->ctx)
+		alcDestroyContext(al->ctx);
+	if (al->handle)
+		alcCloseDevice(al->handle);
+	free(al);
+}
+
 void audio_init(int rate) {
 	al = (al_t*)calloc(1, sizeof(al_t));
 	if (!al)
-		return NULL;
+		return;
 
 	al->handle = alcOpenDevice(NULL);
 	if (!al->handle)
@@ -144,26 +165,5 @@ void audio_init(int rate) {
 	al->res_ptr = NUMBUFFERS;
 
 error:
-	al_free(al);
-}
-
-void audio_deinit() {
-	if (!al)
-		return;
-
-	alSourceStop(al->source);
-	alDeleteSources(1, &al->source);
-
-	if (al->buffers)
-		alDeleteBuffers(NUMBUFFERS, al->buffers);
-
-	free(al->buffers);
-	free(al->res_buf);
-	alcMakeContextCurrent(NULL);
-
-	if (al->ctx)
-		alcDestroyContext(al->ctx);
-	if (al->handle)
-		alcCloseDevice(al->handle);
-	free(al);
+	audio_deinit();
 }
