@@ -34,7 +34,7 @@ jobs:
       - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
       - run: 7z x openal-soft-1.21.0-bin.zip -o/c/
       - run: wget https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN64.zip
-      - run: unzip glfw-3.3.4.bin.WIN64.zip /c/
+      - run: 7z x glfw-3.3.4.bin.WIN64.zip -o/c/
       - run: echo "CFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L\"/c/openal-soft-1.21.0-bin/libs/Win64/\" -L\"/c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/\"" >> $GITHUB_ENV
       - run: CC=gcc make
