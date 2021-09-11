@@ -43,4 +43,4 @@ bundle: $(TARGET)
 	zip -r ROMBundler-$(OS)-$(VERSION).zip ROMBundler-$(OS)-$(VERSION)
 
 clean:
-	rm -f $(OBJ) $(TARGET) ROMBundler-*
+	rm -rf $(OBJ) $(TARGET) ROMBundler-*
