@@ -34,5 +34,5 @@ jobs:
       - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
       - run: 7z x openal-soft-1.21.0-bin.zip -o/c/
       - run: echo "CFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\"" >> $GITHUB_ENV
-      - run: echo "LDFLAGS=-L\"/c/openal-soft-1.21.0-bin/libs/Win64/|"" >> $GITHUB_ENV
+      - run: echo "LDFLAGS=-L\"/c/openal-soft-1.21.0-bin/libs/Win64/\"" >> $GITHUB_ENV
       - run: make
