@@ -19,12 +19,12 @@ See our Github Action config files for detailed instructions on how to setup dep
 To compile:
 
 ```
-    make
+make
 ```
 
 # Usage
 
-You don't need to compile rombundler if you just want to use it, you can get one of the binary releases [here](https://github.com/kivutar/rombundler/releases)
+You don't need to compile `rombundler` if you just want to use it, you can get one of the binary releases [here](https://github.com/kivutar/rombundler/releases)
 
 Then modify the config.ini to fit your needs:
 
@@ -35,6 +35,8 @@ Then modify the config.ini to fit your needs:
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
 For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. ROMBundler releases are for 64bit systems only for now.
+
+Place your ROM in the same folder. And set the ROM name in your config.ini.
 
 ROMBundler will read the ini file, load the emulator and the ROM and the game will start in full screen mode.
 
