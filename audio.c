@@ -66,8 +66,6 @@ static bool get_buffer(ALuint *buffer)
 		{
 			if (unqueue_buffers())
 				break;
-
-			usleep(1);
 		}
 	}
 

@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
-      - run: make bundle
+      - run: OS=Linux VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
         uses: alexellis/upload-assets@0.2.2
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew install openal-soft glfw3
-      - run: make bundle
+      - run: OS=OSX VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
         uses: alexellis/upload-assets@0.2.2
@@ -54,7 +54,7 @@ jobs:
       - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/glfw3.dll .
       - run: echo "CFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L./lib" >> $GITHUB_ENV
-      - run: CC=gcc make bundle
+      - run: OS=Windows VERSION=$VERSION CC=gcc make bundle
 
       - name: Upload Release Asset
         uses: alexellis/upload-assets@0.2.2
