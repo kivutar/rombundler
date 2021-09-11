@@ -107,7 +107,7 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
 retro_time_t get_time_usec() {
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
-	return tv.tv_sec*1000000ull+tv.tv_usec;
+	return tv.tv_sec*(int64_t)1000000+tv.tv_usec;
 }
 
 static bool core_environment(unsigned cmd, void *data) {
@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
 			if (!runloop_frame_time_last)
 				delta = runloop_frame_time.reference;
 			runloop_frame_time_last = current;
-			runloop_frame_time.callback(delta * 1000);
+			runloop_frame_time.callback(delta);
 		}
 
 		glfwPollEvents();
