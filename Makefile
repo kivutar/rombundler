@@ -1,5 +1,16 @@
+TARGET := rombundler
+AL := -lopenal
+
+ifeq ($(shell uname -s),) # win
+	TARGET := rombundler.exe
+else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
+	TARGET := rombundler.exe
+else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
+	AL := -framework OpenAL
+endif
+
 CFLAGS += -Wall -O3 -fPIC -flto -I. -I./include
-LDFLAGS += -dl -lglfw -framework OpenAL -flto
+LDFLAGS += -dl -lglfw -flto $(AL)
 
 OBJ = main.o glad.o config.o audio.o video.o ini.o utils.o
 
@@ -8,9 +19,9 @@ OBJ = main.o glad.o config.o audio.o video.o ini.o utils.o
 
 .PHONY: all clean
 
-all: rombundler
-rombundler: $(OBJ)
+all: $(TARGET)
+$(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f $(OBJ) rombundler
+	rm -f $(OBJ) $(TARGET)
