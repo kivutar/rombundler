@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: OS=Linux VERSION=$VERSION make bundle
@@ -28,6 +29,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+      - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: brew install openal-soft glfw3
       - run: OS=OSX VERSION=$VERSION make bundle
 
@@ -42,7 +44,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - run: choco install wget unzip --ignore-checksums
+      - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
+      - run: choco install wget zip --ignore-checksums
       - run: mkdir lib
       - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
       - run: 7z x openal-soft-1.21.0-bin.zip -o/c/
