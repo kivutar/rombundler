@@ -22,6 +22,8 @@ You can download libretro cores from http://buildbot.libretro.com/nightly/ and p
 
 ROMBundler will read the ini file, load the emulator and the ROM and the game will start in full screen mode.
 
+You can then rename `rombundler` with the name of your game, change it's icon, and distribute this as a zip.
+
 # TODO
 
  * Windows releases
