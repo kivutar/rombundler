@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "libretro.h"
+#include "audio.h"
 
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
@@ -269,16 +270,6 @@ static void video_render() {
 	glTexCoordPointer(2, GL_FLOAT, 0, g_texcoords);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
-static void audio_init(int frequency) {
-}
-
-static void audio_deinit() {
-}
-
-static size_t audio_write(const void *buf, unsigned frames) {
-	return frames;
 }
 
 static void core_log(enum retro_log_level level, const char *fmt, ...) {
