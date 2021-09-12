@@ -29,8 +29,8 @@ You don't need to compile `rombundler` if you just want to use it, you can get o
 Then modify the config.ini to fit your needs:
 
     title = Shrine Maiden Shizuka Demo 2
-    core = blastem_libretro.dylib
-    rom = Shrine Maiden Shizuka Demo 2.md
+    core = ./blastem_libretro.dylib
+    rom = ./Shrine Maiden Shizuka Demo 2.md
     swap_interval = 1
     full_screen = 0
     scale = 3
