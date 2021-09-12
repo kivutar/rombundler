@@ -48,7 +48,8 @@ static struct {
 	void (*retro_unload_game)(void);
 } g_retro;
 
-struct retro_frame_time_callback runloop_frame_time;
+static struct retro_frame_time_callback runloop_frame_time;
+static retro_usec_t runloop_frame_time_last = 0;
 
 static void core_log(enum retro_log_level level, const char *fmt, ...) {
 	char buffer[4096] = {0};
@@ -69,7 +70,7 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
 		exit(EXIT_FAILURE);
 }
 
-retro_time_t get_time_usec() {
+static retro_time_t get_time_usec() {
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
 	return tv.tv_sec*(int64_t)1000000+tv.tv_usec;
@@ -214,6 +215,16 @@ libc_error:
 }
 
 void core_run() {
+	if (runloop_frame_time.callback) {
+		retro_time_t current = get_time_usec();
+		retro_time_t delta = current - runloop_frame_time_last;
+
+		if (!runloop_frame_time_last)
+			delta = runloop_frame_time.reference;
+		runloop_frame_time_last = current;
+		runloop_frame_time.callback(delta);
+	}
+
 	g_retro.retro_run();
 }
 

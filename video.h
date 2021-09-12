@@ -1,3 +1,5 @@
+#include "libretro.h"
+
 void create_window(int width, int height);
 void video_configure(const struct retro_game_geometry *geom);
 bool video_set_pixel_format(unsigned format);

@@ -9,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-#include "libretro.h"
 #include "config.h"
 #include "core.h"
 #include "audio.h"
@@ -19,8 +18,6 @@
 #include "utils.h"
 
 extern GLFWwindow *g_win;
-extern struct retro_frame_time_callback runloop_frame_time;
-retro_usec_t runloop_frame_time_last = 0;
 config g_cfg;
 
 static void error_cb(int error, const char* description)
@@ -41,16 +38,6 @@ int main(int argc, char *argv[]) {
 	core_load_game(g_cfg.rom);
 
 	while (!glfwWindowShouldClose(g_win)) {
-		if (runloop_frame_time.callback) {
-			retro_time_t current = get_time_usec();
-			retro_time_t delta = current - runloop_frame_time_last;
-
-			if (!runloop_frame_time_last)
-				delta = runloop_frame_time.reference;
-			runloop_frame_time_last = current;
-			runloop_frame_time.callback(delta);
-		}
-
 		glfwPollEvents();
 
 		core_run();
