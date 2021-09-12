@@ -5,7 +5,7 @@ struct keymap {
 	unsigned rk;
 };
 
-struct keymap g_binds[] = {
+struct keymap kbd_binds[] = {
 	{ GLFW_KEY_X, RETRO_DEVICE_ID_JOYPAD_A },
 	{ GLFW_KEY_Z, RETRO_DEVICE_ID_JOYPAD_B },
 	{ GLFW_KEY_A, RETRO_DEVICE_ID_JOYPAD_Y },
@@ -20,13 +20,36 @@ struct keymap g_binds[] = {
 	{ 0, 0 }
 };
 
-static unsigned g_joy[RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
+struct keymap joy_binds[] = {
+	{ GLFW_GAMEPAD_BUTTON_B, RETRO_DEVICE_ID_JOYPAD_A },
+	{ GLFW_GAMEPAD_BUTTON_A, RETRO_DEVICE_ID_JOYPAD_B },
+	{ GLFW_GAMEPAD_BUTTON_X, RETRO_DEVICE_ID_JOYPAD_Y },
+	{ GLFW_GAMEPAD_BUTTON_Y, RETRO_DEVICE_ID_JOYPAD_X },
+	{ GLFW_GAMEPAD_BUTTON_DPAD_UP, RETRO_DEVICE_ID_JOYPAD_UP },
+	{ GLFW_GAMEPAD_BUTTON_DPAD_DOWN, RETRO_DEVICE_ID_JOYPAD_DOWN },
+	{ GLFW_GAMEPAD_BUTTON_DPAD_LEFT, RETRO_DEVICE_ID_JOYPAD_LEFT },
+	{ GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, RETRO_DEVICE_ID_JOYPAD_RIGHT },
+	{ GLFW_GAMEPAD_BUTTON_START, RETRO_DEVICE_ID_JOYPAD_START },
+	{ GLFW_GAMEPAD_BUTTON_BACK, RETRO_DEVICE_ID_JOYPAD_SELECT },
+
+	{ 0, 0 }
+};
+
+static unsigned joy[RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
 extern GLFWwindow *g_win;
 
 void input_poll(void) {
 	int i;
-	for (i = 0; g_binds[i].k || g_binds[i].rk; ++i)
-		g_joy[g_binds[i].rk] = (glfwGetKey(g_win, g_binds[i].k) == GLFW_PRESS);
+	for (i = 0; kbd_binds[i].k || kbd_binds[i].rk; ++i)
+		joy[kbd_binds[i].rk] = (glfwGetKey(g_win, kbd_binds[i].k) == GLFW_PRESS);
+
+	if (glfwJoystickIsGamepad(GLFW_JOYSTICK_1))
+	{
+		GLFWgamepadstate state;
+		if (glfwGetGamepadState(GLFW_JOYSTICK_1, &state))
+			for (i = 0; i < 11; i++)
+				joy[joy_binds[i].rk] = state.buttons[joy_binds[i].k];
+	}
 
 	if (glfwGetKey(g_win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(g_win, true);
@@ -36,5 +59,5 @@ int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id)
 	if (port || index || device != RETRO_DEVICE_JOYPAD)
 		return 0;
 
-	return g_joy[id];
+	return joy[id];
 }
