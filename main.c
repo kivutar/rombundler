@@ -101,6 +101,11 @@ static bool core_environment(unsigned cmd, void *data) {
 			*bval = true;
 			break;
 		}
+		case RETRO_ENVIRONMENT_GET_FASTFORWARDING: {
+			bool *bval = (bool*)data;
+			*bval = false;
+			break;
+		}
 		case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE: {
 			bool *bval = (bool*)data;
 			*bval = false;
