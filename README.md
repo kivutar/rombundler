@@ -31,6 +31,7 @@ Then modify the config.ini to fit your needs:
     title = Shrine Maiden Shizuka Demo 2
     core = blastem_libretro.dylib
     rom = Shrine Maiden Shizuka Demo 2.md
+    swap_interval = 1
 
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
@@ -59,10 +60,10 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
  * snes9x_libretro
  * genesis_plus_gx_libretro
  * nes_libretro
- * md_libretro
  * mesen_libretro
  * mesen-s_libretro
 
 Not yet compatible:
 
  * Any GL core
+ * md_libretro

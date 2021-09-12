@@ -37,6 +37,8 @@ int main(int argc, char *argv[]) {
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
 
+	glfwSwapInterval(g_cfg.swap_interval);
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
