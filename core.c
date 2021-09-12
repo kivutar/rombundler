@@ -168,13 +168,13 @@ void core_load(const char *sofile) {
 	load_sym(set_audio_sample_batch, retro_set_audio_sample_batch);
 
 	set_environment(core_environment);
+	core.retro_init();
 	set_video_refresh(video_refresh);
 	set_input_poll(input_poll);
 	set_input_state(input_state);
 	set_audio_sample(audio_sample);
 	set_audio_sample_batch(audio_sample_batch);
 
-	core.retro_init();
 	core.initialized = true;
 }
 
