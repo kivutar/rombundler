@@ -10,7 +10,6 @@
 
 GLFWwindow *window = NULL;
 extern config g_cfg;
-static float scale = 3;
 
 static GLfloat g_vertex[] = {
 	-1.0f, -1.0f, // left-bottom
@@ -46,9 +45,11 @@ void create_window(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	// GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	GLFWmonitor* monitor = NULL;
+	if (g_cfg.fullscreen)
+		monitor = glfwGetPrimaryMonitor();
 
-	window = glfwCreateWindow(width, height, g_cfg.title, NULL, NULL);
+	window = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
 
 	if (!window)
 		die("Failed to create window.");
@@ -96,8 +97,8 @@ void video_configure(const struct retro_game_geometry *geom) {
 
 	resize_to_aspect(geom->aspect_ratio, geom->base_width * 1, geom->base_height * 1, &nwidth, &nheight);
 
-	nwidth *= scale;
-	nheight *= scale;
+	nwidth *= g_cfg.scale;
+	nheight *= g_cfg.scale;
 
 	if (!window)
 		create_window(nwidth, nheight);

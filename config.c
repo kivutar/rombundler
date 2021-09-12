@@ -17,6 +17,10 @@ int handler(void* user, const char* section, const char* name, const char* value
 		pconfig->rom = strdup(value);
 	else if (MATCH("", "swap_interval"))
 		pconfig->swap_interval = atoi(value);
+	else if (MATCH("", "fullscreen"))
+		pconfig->fullscreen = atoi(value);
+	else if (MATCH("", "scale"))
+		pconfig->scale = atoi(value);
 	else
 		return 0;
 	return 1;

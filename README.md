@@ -32,6 +32,8 @@ Then modify the config.ini to fit your needs:
     core = blastem_libretro.dylib
     rom = Shrine Maiden Shizuka Demo 2.md
     swap_interval = 1
+    full_screen = 0
+    scale = 3
 
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
@@ -39,7 +41,7 @@ For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, an
 
 Place your ROM in the same folder. And set the ROM name in your config.ini.
 
-ROMBundler will read the ini file, load the emulator and the ROM and the game will start in full screen mode.
+ROMBundler will read the ini file, load the emulator and the ROM and the game will start.
 
 You can then rename `rombundler` with the name of your game, change it's icon, and distribute this as a zip.
 
