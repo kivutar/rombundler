@@ -18,6 +18,7 @@ jobs:
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: make
+      - run: ldd rombundler
 
   build_osx:
     runs-on: macos-latest

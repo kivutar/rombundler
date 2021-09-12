@@ -14,7 +14,7 @@ else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
 	LD := $(CC)
 	OS ?= OSX
 else
-	LDFLAGS := -lglfw -flto -lopenal -ldl -lGL
+	LDFLAGS := -flto -lopenal -ldl -lGL $(pkg-config --static --libs glfw3)
 	OS ?= Linux
 endif
 
