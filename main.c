@@ -148,15 +148,6 @@ static void core_video_refresh(const void *data, unsigned width, unsigned height
 		video_refresh(data, width, height, pitch);
 }
 
-static void core_audio_sample(int16_t left, int16_t right) {
-	int16_t buf[2] = {left, right};
-	audio_write(buf, 4);
-}
-
-static size_t core_audio_sample_batch(const int16_t *data, size_t frames) {
-	return audio_write(data, frames*4);
-}
-
 static void core_load(const char *sofile) {
 	void (*set_environment)(retro_environment_t) = NULL;
 	void (*set_video_refresh)(retro_video_refresh_t) = NULL;
@@ -193,8 +184,8 @@ static void core_load(const char *sofile) {
 	set_video_refresh(core_video_refresh);
 	set_input_poll(input_poll);
 	set_input_state(input_state);
-	set_audio_sample(core_audio_sample);
-	set_audio_sample_batch(core_audio_sample_batch);
+	set_audio_sample(audio_sample);
+	set_audio_sample_batch(audio_sample_batch);
 
 	g_retro.retro_init();
 	g_retro.initialized = true;

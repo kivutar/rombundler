@@ -163,3 +163,12 @@ void audio_init(int rate) {
 	memcpy(al->res_buf, al->buffers, NUMBUFFERS * sizeof(ALuint));
 	al->res_ptr = NUMBUFFERS;
 }
+
+void audio_sample(int16_t left, int16_t right) {
+	int16_t buf[2] = {left, right};
+	audio_write(buf, 4);
+}
+
+size_t audio_sample_batch(const int16_t *data, size_t frames) {
+	return audio_write(data, frames*4);
+}
