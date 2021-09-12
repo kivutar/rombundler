@@ -10,11 +10,14 @@ else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -flto
 	OS ?= Windows
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
-	LDFLAGS := -lglfw -flto -framework OpenAL
-	LD := $(CC)
+	LDFLAGS := -flto
+	LDFLAGS += $(shell pkg-config --static --libs glfw3)
+	LDFLAGS += -framework OpenAL
 	OS ?= OSX
 else
-	LDFLAGS := -flto $(shell pkg-config --static --libs glfw3) $(shell pkg-config --static --libs openal)
+	LDFLAGS := -flto
+	LDFLAGS += $(shell pkg-config --static --libs glfw3)
+	LDFLAGS += $(shell pkg-config --static --libs openal)
 	OS ?= Linux
 endif
 
