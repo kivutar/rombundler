@@ -3,18 +3,20 @@ VERSION ?= devel
 
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -flto
+	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll
 	OS ?= Windows
 else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -flto
+	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll
 	OS ?= Windows
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
-	LDFLAGS := -lglfw -flto -framework OpenAL
-	LD := $(CC)
+	LDFLAGS := $(shell pkg-config --libs glfw3)
+	LDFLAGS += -framework OpenAL
 	OS ?= OSX
 else
-	LDFLAGS := -lglfw -flto -lopenal -ldl -lGL
+	LDFLAGS := -ldl
+	LDFLAGS += $(shell pkg-config --libs glfw3)
+	LDFLAGS += $(shell pkg-config --libs openal)
 	OS ?= Linux
 endif
 
@@ -29,7 +31,7 @@ OBJ = main.o glad.o config.o core.o audio.o video.o input.o ini.o utils.o
 
 all: $(TARGET)
 $(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS) -flto
 
 bundle: $(TARGET)
 	mkdir -p ROMBundler-$(OS)-$(VERSION)
