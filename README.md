@@ -60,6 +60,8 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
  * genesis_plus_gx_libretro
  * nes_libretro
  * md_libretro
+ * mesen_libretro
+ * mesen-s_libretro
 
 Not yet compatible:
 

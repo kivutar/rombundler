@@ -40,6 +40,8 @@ int main(int argc, char *argv[]) {
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
+		input_poll();
+
 		core_run();
 
 		glClear(GL_COLOR_BUFFER_BIT);

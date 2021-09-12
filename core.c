@@ -135,6 +135,8 @@ static bool core_environment(unsigned cmd, void *data) {
 	return true;
 }
 
+void input_poll_dummy(void) {}
+
 void core_load(const char *sofile) {
 	void (*set_environment)(retro_environment_t) = NULL;
 	void (*set_video_refresh)(retro_video_refresh_t) = NULL;
@@ -170,7 +172,7 @@ void core_load(const char *sofile) {
 	set_environment(core_environment);
 	core.retro_init();
 	set_video_refresh(video_refresh);
-	set_input_poll(input_poll);
+	set_input_poll(input_poll_dummy);
 	set_input_state(input_state);
 	set_audio_sample(audio_sample);
 	set_audio_sample_batch(audio_sample_batch);
