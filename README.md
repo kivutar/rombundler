@@ -46,5 +46,7 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
 
  * Static linking for Linux and OSX
  * Switch full screen / windowed
- * Joypad support
+ * Multiplayer
  * Support more cores
+ * Shaders
+ * SaveRAM
