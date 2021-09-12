@@ -64,8 +64,12 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
  * nes_libretro
  * mesen_libretro
  * mesen-s_libretro
+ * dosbox_pure_libretro
+ * mgba_libretro
+ * gambatte_libretro
 
 Not yet compatible:
 
- * Any GL core
- * md_libretro
+ * Any GL core (not implemented)
+ * md_libretro (input issues)
+ * sameboy_libretro (audio issues)
