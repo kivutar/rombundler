@@ -143,11 +143,6 @@ static bool core_environment(unsigned cmd, void *data) {
 	return true;
 }
 
-static void core_video_refresh(const void *data, unsigned width, unsigned height, size_t pitch) {
-	if (data)
-		video_refresh(data, width, height, pitch);
-}
-
 static void core_load(const char *sofile) {
 	void (*set_environment)(retro_environment_t) = NULL;
 	void (*set_video_refresh)(retro_video_refresh_t) = NULL;
@@ -181,7 +176,7 @@ static void core_load(const char *sofile) {
 	load_sym(set_audio_sample_batch, retro_set_audio_sample_batch);
 
 	set_environment(core_environment);
-	set_video_refresh(core_video_refresh);
+	set_video_refresh(video_refresh);
 	set_input_poll(input_poll);
 	set_input_state(input_state);
 	set_audio_sample(audio_sample);

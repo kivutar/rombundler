@@ -10,7 +10,7 @@
 
 GLFWwindow *g_win = NULL;
 extern config g_cfg;
-static float g_scale = 3;
+static float scale = 3;
 
 static GLfloat g_vertex[] = {
 	-1.0f, -1.0f, // left-bottom
@@ -35,7 +35,7 @@ static struct {
 	GLuint pixfmt;
 	GLuint pixtype;
 	GLuint bpp;
-} g_video = {0};
+} video = {0};
 
 static void resize_cb(GLFWwindow *win, int w, int h) {
 	glViewport(0, 0, w, h);
@@ -68,14 +68,14 @@ void create_window(int width, int height) {
 }
 
 static void refresh_vertex_data() {
-	assert(g_video.tex_w);
-	assert(g_video.tex_h);
-	assert(g_video.clip_w);
-	assert(g_video.clip_h);
+	assert(video.tex_w);
+	assert(video.tex_h);
+	assert(video.clip_w);
+	assert(video.clip_h);
 
 	GLfloat *coords = g_texcoords;
-	coords[1] = coords[5] = (float)g_video.clip_h / g_video.tex_h;
-	coords[4] = coords[6] = (float)g_video.clip_w / g_video.tex_w;
+	coords[1] = coords[5] = (float)video.clip_h / video.tex_h;
+	coords[4] = coords[6] = (float)video.clip_w / video.tex_w;
 }
 
 static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh) {
@@ -96,103 +96,83 @@ void video_configure(const struct retro_game_geometry *geom) {
 
 	resize_to_aspect(geom->aspect_ratio, geom->base_width * 1, geom->base_height * 1, &nwidth, &nheight);
 
-	nwidth *= g_scale;
-	nheight *= g_scale;
+	nwidth *= scale;
+	nheight *= scale;
 
 	if (!g_win)
 		create_window(nwidth, nheight);
 
-	if (g_video.tex_id)
-		glDeleteTextures(1, &g_video.tex_id);
+	if (video.tex_id)
+		glDeleteTextures(1, &video.tex_id);
 
-	g_video.tex_id = 0;
+	video.tex_id = 0;
 
-	if (!g_video.pixfmt)
-		g_video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
+	if (!video.pixfmt)
+		video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
 
 	glfwSetWindowSize(g_win, nwidth, nheight);
 
-	glGenTextures(1, &g_video.tex_id);
+	glGenTextures(1, &video.tex_id);
 
-	if (!g_video.tex_id)
+	if (!video.tex_id)
 		die("Failed to create the video texture");
 
-	g_video.pitch = geom->base_width * g_video.bpp;
+	video.pitch = geom->base_width * video.bpp;
 
-	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
+	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, geom->max_width, geom->max_height, 0,
-			g_video.pixtype, g_video.pixfmt, NULL);
+			video.pixtype, video.pixfmt, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	g_video.tex_w = geom->max_width;
-	g_video.tex_h = geom->max_height;
-	g_video.clip_w = geom->base_width;
-	g_video.clip_h = geom->base_height;
+	video.tex_w = geom->max_width;
+	video.tex_h = geom->max_height;
+	video.clip_w = geom->base_width;
+	video.clip_h = geom->base_height;
 
 	refresh_vertex_data();
 }
 
 bool video_set_pixel_format(unsigned format) {
-	if (g_video.tex_id)
+	if (video.tex_id)
 		die("Tried to change pixel format after initialization.");
 
 	switch (format) {
-	case RETRO_PIXEL_FORMAT_0RGB1555:
-		g_video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
-		g_video.pixtype = GL_BGRA;
-		g_video.bpp = sizeof(uint16_t);
-		break;
-	case RETRO_PIXEL_FORMAT_XRGB8888:
-		g_video.pixfmt = GL_UNSIGNED_INT_8_8_8_8_REV;
-		g_video.pixtype = GL_BGRA;
-		g_video.bpp = sizeof(uint32_t);
-		break;
-	case RETRO_PIXEL_FORMAT_RGB565:
-		g_video.pixfmt  = GL_UNSIGNED_SHORT_5_6_5;
-		g_video.pixtype = GL_RGB;
-		g_video.bpp = sizeof(uint16_t);
-		break;
-	default:
-		die("Unknown pixel type %u", format);
+		case RETRO_PIXEL_FORMAT_0RGB1555:
+			video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
+			video.pixtype = GL_BGRA;
+			video.bpp = sizeof(uint16_t);
+			break;
+		case RETRO_PIXEL_FORMAT_XRGB8888:
+			video.pixfmt = GL_UNSIGNED_INT_8_8_8_8_REV;
+			video.pixtype = GL_BGRA;
+			video.bpp = sizeof(uint32_t);
+			break;
+		case RETRO_PIXEL_FORMAT_RGB565:
+			video.pixfmt  = GL_UNSIGNED_SHORT_5_6_5;
+			video.pixtype = GL_RGB;
+			video.bpp = sizeof(uint16_t);
+			break;
+		default:
+			die("Unknown pixel type %u", format);
 	}
 
 	return true;
 }
 
-void video_refresh(const void *data, unsigned width, unsigned height, unsigned pitch) {
-	if (g_video.clip_w != width || g_video.clip_h != height) {
-		g_video.clip_h = height;
-		g_video.clip_w = width;
-
-		refresh_vertex_data();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
-
-	if (pitch != g_video.pitch) {
-		g_video.pitch = pitch;
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, g_video.pitch / g_video.bpp);
-	}
-
-	if (data) {
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, g_video.pixtype, g_video.pixfmt, data);
-	}
-}
-
 void video_deinit() {
-	if (g_video.tex_id)
-		glDeleteTextures(1, &g_video.tex_id);
+	if (video.tex_id)
+		glDeleteTextures(1, &video.tex_id);
 
-	g_video.tex_id = 0;
+	video.tex_id = 0;
 }
 
 void video_render() {
-	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
+	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -201,4 +181,26 @@ void video_render() {
 	glTexCoordPointer(2, GL_FLOAT, 0, g_texcoords);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void video_refresh(const void *data, unsigned width, unsigned height, size_t pitch) {
+	if (!data || !pitch)
+		return;
+
+	if (video.clip_w != width || video.clip_h != height) {
+		video.clip_h = height;
+		video.clip_w = width;
+
+		refresh_vertex_data();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, video.tex_id);
+
+	if (pitch != video.pitch) {
+		video.pitch = pitch;
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
+	}
+
+	if (data)
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, video.pixtype, video.pixfmt, data);
 }
