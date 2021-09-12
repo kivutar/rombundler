@@ -20,17 +20,17 @@
 
 #if defined(_WIN32)
 #define load_lib(L) LoadLibrary(L);
-#define load_sym(V, S) ((*(void**)&V) = GetProcAddress(g_retro.handle, #S))
+#define load_sym(V, S) ((*(void**)&V) = GetProcAddress(core.handle, #S))
 #define close_lib(L) //(L)
 #else
 #define load_sym(V, S) do {\
-	if (!((*(void**)&V) = dlsym(g_retro.handle, #S))) \
+	if (!((*(void**)&V) = dlsym(core.handle, #S))) \
 		die("Failed to load symbol '" #S "'': %s", dlerror()); \
 	} while (0)
 #define load_lib(L) dlopen(L, RTLD_LAZY);
 #define close_lib(L) dlclose(L);
 #endif
-#define load_retro_sym(S) load_sym(g_retro.S, S)
+#define load_retro_sym(S) load_sym(core.S, S)
 
 static struct {
 	void *handle;
@@ -46,7 +46,7 @@ static struct {
 	void (*retro_run)(void);
 	bool (*retro_load_game)(const struct retro_game_info *game);
 	void (*retro_unload_game)(void);
-} g_retro;
+} core;
 
 static struct retro_frame_time_callback runloop_frame_time;
 static retro_usec_t runloop_frame_time_last = 0;
@@ -143,10 +143,10 @@ void core_load(const char *sofile) {
 	void (*set_audio_sample)(retro_audio_sample_t) = NULL;
 	void (*set_audio_sample_batch)(retro_audio_sample_batch_t) = NULL;
 
-	memset(&g_retro, 0, sizeof(g_retro));
-	g_retro.handle = load_lib(sofile);
+	memset(&core, 0, sizeof(core));
+	core.handle = load_lib(sofile);
 
-	if (!g_retro.handle)
+	if (!core.handle)
 		die("Failed to load core");
 
 	load_retro_sym(retro_init);
@@ -174,8 +174,8 @@ void core_load(const char *sofile) {
 	set_audio_sample(audio_sample);
 	set_audio_sample_batch(audio_sample_batch);
 
-	g_retro.retro_init();
-	g_retro.initialized = true;
+	core.retro_init();
+	core.initialized = true;
 }
 
 void core_load_game(const char *filename) {
@@ -185,33 +185,30 @@ void core_load_game(const char *filename) {
 	FILE *file = fopen(filename, "rb");
 
 	if (!file)
-		goto libc_error;
+		die("The core could not open the file.");
 
 	fseek(file, 0, SEEK_END);
 	info.size = ftell(file);
 	rewind(file);
 
-	g_retro.retro_get_system_info(&si);
+	core.retro_get_system_info(&si);
 
 	if (!si.need_fullpath) {
 		info.data = malloc(info.size);
 
 		if (!info.data || !fread((void*)info.data, info.size, 1, file))
-			goto libc_error;
+			die("The core could not read the file.");
 	}
 
-	if (!g_retro.retro_load_game(&info))
+	if (!core.retro_load_game(&info))
 		die("The core failed to load the content.");
 
-	g_retro.retro_get_system_av_info(&av);
+	core.retro_get_system_av_info(&av);
 
 	video_configure(&av.geometry);
 	audio_init(av.timing.sample_rate);
 
 	return;
-
-libc_error:
-	die("Failed to load content '%s': %s", filename, strerror(errno));
 }
 
 void core_run() {
@@ -225,15 +222,15 @@ void core_run() {
 		runloop_frame_time.callback(delta);
 	}
 
-	g_retro.retro_run();
+	core.retro_run();
 }
 
 void core_unload() {
-	if (g_retro.initialized)
-		g_retro.retro_deinit();
+	if (core.initialized)
+		core.retro_deinit();
 
-	if (g_retro.handle)
-		close_lib(g_retro.handle);
+	if (core.handle)
+		close_lib(core.handle);
 }
 
 

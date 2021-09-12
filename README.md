@@ -50,3 +50,19 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
  * List supported cores
  * Shaders
  * SaveRAM
+
+# Known working cores
+
+ * lutro_libretro
+ * fceumm_libretro
+ * blastem_libretro
+ * snes9x_libretro
+ * genesis_plus_gx_libretro
+ * nes_libretro
+ * md_libretro
+
+Not yet compatible:
+
+ * Any GL core
+ * mesen_libretro
+ * mesen-s_libretro
