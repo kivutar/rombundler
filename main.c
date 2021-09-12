@@ -20,6 +20,7 @@
 #include "config.h"
 #include "audio.h"
 #include "video.h"
+#include "input.h"
 #include "ini.h"
 #include "utils.h"
 
@@ -43,28 +44,6 @@ static struct {
 	bool (*retro_load_game)(const struct retro_game_info *game);
 	void (*retro_unload_game)(void);
 } g_retro;
-
-struct keymap {
-	unsigned k;
-	unsigned rk;
-};
-
-struct keymap g_binds[] = {
-	{ GLFW_KEY_X, RETRO_DEVICE_ID_JOYPAD_A },
-	{ GLFW_KEY_Z, RETRO_DEVICE_ID_JOYPAD_B },
-	{ GLFW_KEY_A, RETRO_DEVICE_ID_JOYPAD_Y },
-	{ GLFW_KEY_S, RETRO_DEVICE_ID_JOYPAD_X },
-	{ GLFW_KEY_UP, RETRO_DEVICE_ID_JOYPAD_UP },
-	{ GLFW_KEY_DOWN, RETRO_DEVICE_ID_JOYPAD_DOWN },
-	{ GLFW_KEY_LEFT, RETRO_DEVICE_ID_JOYPAD_LEFT },
-	{ GLFW_KEY_RIGHT, RETRO_DEVICE_ID_JOYPAD_RIGHT },
-	{ GLFW_KEY_ENTER, RETRO_DEVICE_ID_JOYPAD_START },
-	{ GLFW_KEY_BACKSPACE, RETRO_DEVICE_ID_JOYPAD_SELECT },
-
-	{ 0, 0 }
-};
-
-static unsigned g_joy[RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
 
 #if defined(_WIN32)
 #define load_lib(L) LoadLibrary(L);
@@ -169,22 +148,6 @@ static void core_video_refresh(const void *data, unsigned width, unsigned height
 		video_refresh(data, width, height, pitch);
 }
 
-static void core_input_poll(void) {
-	int i;
-	for (i = 0; g_binds[i].k || g_binds[i].rk; ++i)
-		g_joy[g_binds[i].rk] = (glfwGetKey(g_win, g_binds[i].k) == GLFW_PRESS);
-
-	if (glfwGetKey(g_win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(g_win, true);
-}
-
-static int16_t core_input_state(unsigned port, unsigned device, unsigned index, unsigned id) {
-	if (port || index || device != RETRO_DEVICE_JOYPAD)
-		return 0;
-
-	return g_joy[id];
-}
-
 static void core_audio_sample(int16_t left, int16_t right) {
 	int16_t buf[2] = {left, right};
 	audio_write(buf, 4);
@@ -228,8 +191,8 @@ static void core_load(const char *sofile) {
 
 	set_environment(core_environment);
 	set_video_refresh(core_video_refresh);
-	set_input_poll(core_input_poll);
-	set_input_state(core_input_state);
+	set_input_poll(input_poll);
+	set_input_state(input_state);
 	set_audio_sample(core_audio_sample);
 	set_audio_sample_batch(core_audio_sample_batch);
 
