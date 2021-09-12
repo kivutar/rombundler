@@ -10,7 +10,7 @@ else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll
 	OS ?= Windows
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
-	LDFLAGS := $(shell pkg-config --libs glfw3)
+	LDFLAGS := -Ldeps/osx/lib -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
 	LDFLAGS += -framework OpenAL
 	OS ?= OSX
 else
@@ -20,7 +20,7 @@ else
 	OS ?= Linux
 endif
 
-CFLAGS += -Wall -O3 -fPIC -flto -I. -I./include
+CFLAGS += -Wall -O3 -fPIC -flto -I. -Iinclude -Ideps/include
 
 OBJ = main.o glad.o config.o core.o audio.o video.o input.o ini.o utils.o
 
