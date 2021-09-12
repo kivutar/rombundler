@@ -30,7 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
-      - run: brew install openal-soft glfw3
       - run: OS=OSX VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
