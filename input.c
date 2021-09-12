@@ -37,12 +37,12 @@ struct keymap joy_binds[] = {
 
 #define MAX_PLAYERS 5
 static unsigned state[MAX_PLAYERS][RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
-extern GLFWwindow *g_win;
+extern GLFWwindow *window;
 
 void input_poll(void) {
 	int i;
 	for (i = 0; kbd_binds[i].k || kbd_binds[i].rk; ++i)
-		state[0][kbd_binds[i].rk] = (glfwGetKey(g_win, kbd_binds[i].k) == GLFW_PRESS);
+		state[0][kbd_binds[i].rk] = (glfwGetKey(window, kbd_binds[i].k) == GLFW_PRESS);
 
 	int port;
 	for (port = 0; port < MAX_PLAYERS; port++)
@@ -54,8 +54,8 @@ void input_poll(void) {
 					state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
 		}
 
-	if (glfwGetKey(g_win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(g_win, true);
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 }
 
 int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id) {

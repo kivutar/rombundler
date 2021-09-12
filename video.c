@@ -8,7 +8,7 @@
 #include "config.h"
 #include "utils.h"
 
-GLFWwindow *g_win = NULL;
+GLFWwindow *window = NULL;
 extern config g_cfg;
 static float scale = 3;
 
@@ -48,14 +48,14 @@ void create_window(int width, int height) {
 
 	// GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
-	g_win = glfwCreateWindow(width, height, g_cfg.title, NULL, NULL);
+	window = glfwCreateWindow(width, height, g_cfg.title, NULL, NULL);
 
-	if (!g_win)
+	if (!window)
 		die("Failed to create window.");
 
-	glfwSetFramebufferSizeCallback(g_win, resize_cb);
+	glfwSetFramebufferSizeCallback(window, resize_cb);
 
-	glfwMakeContextCurrent(g_win);
+	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
 		die("Failed to initialize glad");
@@ -64,7 +64,7 @@ void create_window(int width, int height) {
 
 	glEnable(GL_TEXTURE_2D);
 
-	resize_cb(g_win, width, height);
+	resize_cb(window, width, height);
 }
 
 static void refresh_vertex_data() {
@@ -99,7 +99,7 @@ void video_configure(const struct retro_game_geometry *geom) {
 	nwidth *= scale;
 	nheight *= scale;
 
-	if (!g_win)
+	if (!window)
 		create_window(nwidth, nheight);
 
 	if (video.tex_id)
@@ -110,7 +110,7 @@ void video_configure(const struct retro_game_geometry *geom) {
 	if (!video.pixfmt)
 		video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
 
-	glfwSetWindowSize(g_win, nwidth, nheight);
+	glfwSetWindowSize(window, nwidth, nheight);
 
 	glGenTextures(1, &video.tex_id);
 

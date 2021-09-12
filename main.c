@@ -17,7 +17,7 @@
 #include "ini.h"
 #include "utils.h"
 
-extern GLFWwindow *g_win;
+extern GLFWwindow *window;
 config g_cfg;
 
 static void error_cb(int error, const char* description)
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
 
-	while (!glfwWindowShouldClose(g_win)) {
+	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
 		core_run();
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 		video_render();
 
-		glfwSwapBuffers(g_win);
+		glfwSwapBuffers(window);
 	}
 
 	core_unload();
