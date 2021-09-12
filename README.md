@@ -67,6 +67,8 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
  * dosbox_pure_libretro
  * mgba_libretro
  * gambatte_libretro
+ * gearsystem_libretro
+ * pcsx_rearmed_libretro
 
 Not yet compatible:
 
