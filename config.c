@@ -21,6 +21,8 @@ int handler(void* user, const char* section, const char* name, const char* value
 		pconfig->fullscreen = atoi(value);
 	else if (MATCH("", "scale"))
 		pconfig->scale = atoi(value);
+	else if (MATCH("", "hide_cursor"))
+		pconfig->hide_cursor = strcmp(value, "true") == 0;
 	else
 		return 0;
 	return 1;

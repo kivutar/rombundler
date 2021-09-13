@@ -54,6 +54,9 @@ void create_window(int width, int height) {
 	if (!window)
 		die("Failed to create window.");
 
+	if (g_cfg.hide_cursor)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
 	glfwSetFramebufferSizeCallback(window, resize_cb);
 
 	glfwMakeContextCurrent(window);
