@@ -6,7 +6,7 @@ typedef struct
     const char* core;
     const char* rom;
     int swap_interval;
-    int fullscreen;
+    bool fullscreen;
     int scale;
     bool hide_cursor;
 } config;

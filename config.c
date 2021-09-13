@@ -18,7 +18,7 @@ int handler(void* user, const char* section, const char* name, const char* value
 	else if (MATCH("", "swap_interval"))
 		pconfig->swap_interval = atoi(value);
 	else if (MATCH("", "fullscreen"))
-		pconfig->fullscreen = atoi(value);
+		pconfig->fullscreen = strcmp(value, "true") == 0;
 	else if (MATCH("", "scale"))
 		pconfig->scale = atoi(value);
 	else if (MATCH("", "hide_cursor"))
