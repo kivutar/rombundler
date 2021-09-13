@@ -1,4 +1,7 @@
 #include "input.h"
+#include "config.h"
+
+extern config g_cfg;
 
 struct keymap {
 	unsigned k;
@@ -52,6 +55,19 @@ void input_poll(void) {
 			if (glfwGetGamepadState(port, &pad))
 				for (i = 0; i < 11; i++)
 					state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
+
+			if (g_cfg.map_analog_to_dpad)
+			{
+				int count;
+				const float *axes = glfwGetJoystickAxes(port, &count);
+				if (count >= 2)
+				{
+					state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] = axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
+					state[port][RETRO_DEVICE_ID_JOYPAD_RIGHT] = axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5;
+					state[port][RETRO_DEVICE_ID_JOYPAD_UP] = axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5;
+					state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] = axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
+				}
+			}
 		}
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

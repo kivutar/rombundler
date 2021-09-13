@@ -23,6 +23,8 @@ int handler(void* user, const char* section, const char* name, const char* value
 		pconfig->scale = atoi(value);
 	else if (MATCH("", "hide_cursor"))
 		pconfig->hide_cursor = strcmp(value, "true") == 0;
+	else if (MATCH("", "map_analog_to_dpad"))
+		pconfig->map_analog_to_dpad = strcmp(value, "true") == 0;
 	else
 		return 0;
 	return 1;

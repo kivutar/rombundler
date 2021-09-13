@@ -35,6 +35,7 @@ Then modify the config.ini to fit your needs:
     full_screen = false
     scale = 3
     hide_cursor = false
+    map_analog_to_dpad = true
 
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
