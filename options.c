@@ -28,8 +28,8 @@ bool get_option(char const * key, char const ** value)
 
 int opt_handler(void* user, const char* section, const char* name, const char* value)
 {
-	strlcpy(opt_keys[num_opts], name, sizeof(opt_keys[num_opts]));
-	strlcpy(opt_values[num_opts], value, sizeof(opt_values[num_opts]));
+	strcpy(opt_keys[num_opts], name);
+	strcpy(opt_values[num_opts], value);
 	num_opts++;
 	return 1;
 }
