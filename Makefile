@@ -22,7 +22,7 @@ endif
 
 CFLAGS += -Wall -O3 -fPIC -flto -I. -Iinclude -Ideps/include
 
-OBJ = main.o glad.o config.o core.o audio.o video.o input.o ini.o utils.o
+OBJ = main.o glad.o config.o core.o audio.o video.o input.o options.o ini.o utils.o
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)

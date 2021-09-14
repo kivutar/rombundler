@@ -47,6 +47,12 @@ ROMBundler will read the ini file, load the emulator and the ROM and the game wi
 
 You can then rename `rombundler` with the name of your game, change it's icon, and distribute this as a zip.
 
+If you need special options for the emulator, you can set them by creating a options.ini file like this:
+
+    fceumm_sndvolume = 7
+    fceumm_palette = default
+    fceumm_ntsc_filter = composite
+
 # TODO
 
  * Static linking for Linux

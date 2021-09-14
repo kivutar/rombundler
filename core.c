@@ -17,6 +17,7 @@
 #include "video.h"
 #include "audio.h"
 #include "input.h"
+#include "options.h"
 
 #if defined(_WIN32)
 #define load_lib(L) LoadLibrary(L);
@@ -76,43 +77,49 @@ static retro_time_t get_time_usec() {
 	return tv.tv_sec*(int64_t)1000000+tv.tv_usec;
 }
 
+
+
 static bool core_environment(unsigned cmd, void *data) {
 	switch (cmd) {
 		case RETRO_ENVIRONMENT_GET_LOG_INTERFACE: {
 			struct retro_log_callback *cb = (struct retro_log_callback *)data;
 			cb->log = core_log;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_CAN_DUPE: {
 			bool *bval = (bool*)data;
 			*bval = true;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_FASTFORWARDING: {
 			bool *bval = (bool*)data;
 			*bval = false;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE: {
 			bool *bval = (bool*)data;
 			*bval = false;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE: {
 			int *value = (int*)data;
 			*value = 1 << 0 | 1 << 1;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK: {
 			const struct retro_frame_time_callback *frame_time =
 				(const struct retro_frame_time_callback*)data;
 			runloop_frame_time = *frame_time;
-			break;
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_PERF_INTERFACE: {
 			struct retro_perf_callback *perf_cb = (struct retro_perf_callback*)data;
 			perf_cb->get_time_usec = get_time_usec;
-			break;
+		}
+		break;
+		case RETRO_ENVIRONMENT_GET_VARIABLE: {
+			struct retro_variable *var = (struct retro_variable*) data;
+			return get_option(var->key, &var->value);
 		}
 		case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
 			const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;
