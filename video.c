@@ -144,7 +144,12 @@ void create_window(int width, int height) {
 
 	GLFWmonitor* monitor = NULL;
 	if (g_cfg.fullscreen)
+	{
 		monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+		width = mode->width;
+		height = mode->height;
+	}
 
 	window = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
 
@@ -264,7 +269,7 @@ void video_configure(const struct retro_game_geometry *geom) {
 	if (!video.pixfmt)
 		video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
 
-	glfwSetWindowSize(window, nwidth, nheight);
+	//glfwSetWindowSize(window, nwidth, nheight);
 
 	glGenTextures(1, &video.tex_id);
 

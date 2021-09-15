@@ -44,13 +44,9 @@ int main(int argc, char *argv[]) {
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-
 		input_poll();
-
 		core_run();
-
 		video_render();
-
 		glfwSwapBuffers(window);
 	}
 
