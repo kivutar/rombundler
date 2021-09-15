@@ -139,10 +139,6 @@ static void init_shaders() {
 	glUseProgram(0);
 }
 
-static void resize_cb(GLFWwindow *win, int w, int h) {
-	glViewport(0, 0, w, h);
-}
-
 void create_window(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -165,8 +161,6 @@ void create_window(int width, int height) {
 	if (g_cfg.hide_cursor)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-	glfwSetFramebufferSizeCallback(window, resize_cb);
-
 	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
@@ -177,8 +171,6 @@ void create_window(int width, int height) {
 	glfwSwapInterval(1);
 
 	glEnable(GL_TEXTURE_2D);
-
-	resize_cb(window, width, height);
 }
 
 static void refresh_vertex_data() {
@@ -275,8 +267,6 @@ void video_configure(const struct retro_game_geometry *geom) {
 	if (!video.pixfmt)
 		video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
 
-	//glfwSetWindowSize(window, nwidth, nheight);
-
 	glGenTextures(1, &video.tex_id);
 
 	if (!video.tex_id)
@@ -294,7 +284,7 @@ void video_configure(const struct retro_game_geometry *geom) {
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	init_framebuffer(geom->max_width, geom->max_height);
+	//init_framebuffer(geom->max_width, geom->max_height);
 
 	video.tex_w = geom->max_width;
 	video.tex_h = geom->max_height;
