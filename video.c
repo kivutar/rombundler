@@ -346,7 +346,7 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 
 void video_render() {
 	int w = 0, h = 0;
-	glfwGetWindowSize(window, &w, &h);
+	glfwGetFramebufferSize(window, &w, &h);
 	glViewport(0, 0, w, h);
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -371,7 +371,7 @@ void video_deinit() {
 		glDeleteTextures(1, &video.tex_id);
 
 	if (g_shader.vao)
-		glDeleteVertexArrays(1, &g_shader.vao);
+		glDeleteVertexArraysAPPLE(1, &g_shader.vao);
 
 	if (g_shader.vbo)
 		glDeleteBuffers(1, &g_shader.vbo);
