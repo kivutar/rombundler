@@ -49,8 +49,6 @@ int main(int argc, char *argv[]) {
 
 		core_run();
 
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		video_render();
 
 		glfwSwapBuffers(window);
