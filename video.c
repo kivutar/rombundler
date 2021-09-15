@@ -8,6 +8,12 @@
 #include "config.h"
 #include "utils.h"
 
+#ifdef __APPLE__
+#define glGenVertexArrays glGenVertexArraysAPPLE
+#define glBindVertexArray glBindVertexArrayAPPLE
+#define glDeleteVertexArrays glDeleteVertexArraysAPPLE
+#endif
+
 GLFWwindow *window = NULL;
 extern config g_cfg;
 
@@ -115,7 +121,7 @@ static void init_shaders() {
 	g_shader.u_tex   = glGetUniformLocation(program, "u_tex");
 	g_shader.u_mvp   = glGetUniformLocation(program, "u_mvp");
 
-	glGenVertexArraysAPPLE(1, &g_shader.vao);
+	glGenVertexArrays(1, &g_shader.vao);
 	glGenBuffers(1, &g_shader.vbo);
 
 	glUseProgram(g_shader.program);
@@ -192,7 +198,7 @@ static void refresh_vertex_data() {
 		 1.0f,  1.0f, right,  0.0f,  // right-top
 	};
 
-	glBindVertexArrayAPPLE(g_shader.vao);
+	glBindVertexArray(g_shader.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, g_shader.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
@@ -202,7 +208,7 @@ static void refresh_vertex_data() {
 	glVertexAttribPointer(g_shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
 	glVertexAttribPointer(g_shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
 
-	glBindVertexArrayAPPLE(0);
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -361,9 +367,9 @@ void video_render() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
-	glBindVertexArrayAPPLE(g_shader.vao);
+	glBindVertexArray(g_shader.vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArrayAPPLE(0);
+	glBindVertexArray(0);
 
 	glUseProgram(0);
 }
@@ -376,7 +382,7 @@ void video_deinit() {
 		glDeleteTextures(1, &video.tex_id);
 
 	if (g_shader.vao)
-		glDeleteVertexArraysAPPLE(1, &g_shader.vao);
+		glDeleteVertexArrays(1, &g_shader.vao);
 
 	if (g_shader.vbo)
 		glDeleteBuffers(1, &g_shader.vbo);
