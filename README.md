@@ -55,12 +55,12 @@ If you need special options for the emulator, you can set them by creating a opt
 
 # TODO
 
+ * SaveRAM
  * Static linking for Linux
  * Switch full screen / windowed
- * Analog input
  * List supported cores
+ * Fix aspect ratio
  * Shaders
- * SaveRAM
 
 # Known working cores
 
