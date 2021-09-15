@@ -115,7 +115,7 @@ static void init_shaders() {
 	g_shader.u_tex   = glGetUniformLocation(program, "u_tex");
 	g_shader.u_mvp   = glGetUniformLocation(program, "u_mvp");
 
-	glGenVertexArrays(1, &g_shader.vao);
+	glGenVertexArraysAPPLE(1, &g_shader.vao);
 	glGenBuffers(1, &g_shader.vbo);
 
 	glUseProgram(g_shader.program);
@@ -138,9 +138,9 @@ static void resize_cb(GLFWwindow *win, int w, int h) {
 }
 
 void create_window(int width, int height) {
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	GLFWmonitor* monitor = NULL;
 	if (g_cfg.fullscreen)
@@ -187,7 +187,7 @@ static void refresh_vertex_data() {
 		 1.0f,  1.0f, right,  0.0f,  // right-top
 	};
 
-	glBindVertexArray(g_shader.vao);
+	glBindVertexArrayAPPLE(g_shader.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, g_shader.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
@@ -197,7 +197,7 @@ static void refresh_vertex_data() {
 	glVertexAttribPointer(g_shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
 	glVertexAttribPointer(g_shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
 
-	glBindVertexArray(0);
+	glBindVertexArrayAPPLE(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -258,9 +258,6 @@ void video_configure(const struct retro_game_geometry *geom) {
 
 	if (!window)
 		create_window(nwidth, nheight);
-
-	if (video.tex_id)
-		glDeleteTextures(1, &video.tex_id);
 
 	video.tex_id = 0;
 
@@ -326,9 +323,6 @@ bool video_set_pixel_format(unsigned format) {
 }
 
 void video_refresh(const void *data, unsigned width, unsigned height, size_t pitch) {
-	if (!data || !pitch)
-		return;
-
 	if (video.clip_w != width || video.clip_h != height) {
 		video.clip_h = height;
 		video.clip_w = width;
@@ -351,9 +345,9 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 }
 
 void video_render() {
-	//int w = 0, h = 0;
-	//SDL_GetWindowSize(g_win, &w, &h);
-	//glViewport(0, 0, w, h);
+	int w = 0, h = 0;
+	glfwGetWindowSize(window, &w, &h);
+	glViewport(0, 0, w, h);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -362,9 +356,9 @@ void video_render() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
-	glBindVertexArray(g_shader.vao);
+	glBindVertexArrayAPPLE(g_shader.vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
+	glBindVertexArrayAPPLE(0);
 
 	glUseProgram(0);
 }
