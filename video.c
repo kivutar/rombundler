@@ -11,20 +11,6 @@
 GLFWwindow *window = NULL;
 extern config g_cfg;
 
-static GLfloat g_vertex[] = {
-	-1.0f, -1.0f, // left-bottom
-	-1.0f,  1.0f, // left-top
-	 1.0f, -1.0f, // right-bottom
-	 1.0f,  1.0f, // right-top
-};
-
-static GLfloat g_texcoords[] ={
-	0.0f,  1.0f,
-	0.0f,  0.0f,
-	1.0f,  1.0f,
-	1.0f,  0.0f,
-};
-
 static struct {
 	GLuint tex_id;
 	GLuint fbo_id;
@@ -52,10 +38,9 @@ static struct {
 } g_shader = {0};
 
 static const char *g_vshader_src =
-	"#version 150\n"
-	"in vec2 i_pos;\n"
-	"in vec2 i_coord;\n"
-	"out vec2 o_coord;\n"
+	"attribute vec2 i_pos;\n"
+	"attribute vec2 i_coord;\n"
+	"varying vec2 o_coord;\n"
 	"uniform mat4 u_mvp;\n"
 	"void main() {\n"
 		"o_coord = i_coord;\n"
@@ -63,8 +48,7 @@ static const char *g_vshader_src =
 	"}";
 
 static const char *g_fshader_src =
-	"#version 150\n"
-	"in vec2 o_coord;\n"
+	"varying vec2 o_coord;\n"
 	"uniform sampler2D u_tex;\n"
 	"void main() {\n"
 		"gl_FragColor = texture2D(u_tex, o_coord);\n"
@@ -154,8 +138,8 @@ static void resize_cb(GLFWwindow *win, int w, int h) {
 }
 
 void create_window(int width, int height) {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	GLFWmonitor* monitor = NULL;
