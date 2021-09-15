@@ -4,7 +4,7 @@
 #include "config.h"
 #include "ini.h"
 
-int handler(void* user, const char* section, const char* name, const char* value)
+int cfg_handler(void* user, const char* section, const char* name, const char* value)
 {
 	config* pconfig = (config*)user;
 

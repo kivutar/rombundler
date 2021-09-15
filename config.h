@@ -12,4 +12,4 @@ typedef struct
     bool map_analog_to_dpad;
 } config;
 
-int handler(void* user, const char* section, const char* name, const char* value);
+int cfg_handler(void* user, const char* section, const char* name, const char* value);

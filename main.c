@@ -10,6 +10,7 @@
 #include <glad/glad.h>
 
 #include "config.h"
+#include "options.h"
 #include "core.h"
 #include "audio.h"
 #include "video.h"
@@ -26,8 +27,10 @@ static void error_cb(int error, const char* description)
 }
 
 int main(int argc, char *argv[]) {
-	if (ini_parse("config.ini", handler, &g_cfg) < 0)
-		die("Could not parse ini");
+	if (ini_parse("config.ini", cfg_handler, &g_cfg) < 0)
+		die("Could not parse config.ini");
+
+	ini_parse("options.ini", opt_handler, NULL);
 
 	glfwSetErrorCallback(error_cb);
 
