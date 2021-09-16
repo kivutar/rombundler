@@ -4,27 +4,37 @@
 #include "config.h"
 #include "ini.h"
 
+void cfg_defaults(config *c)
+{
+	c->title = "ROMBundler";
+	c->fullscreen = false;
+	c->scale = 3;
+	c->swap_interval = 1;
+	c->hide_cursor = false;
+	c->map_analog_to_dpad = true;
+}
+
 int cfg_handler(void* user, const char* section, const char* name, const char* value)
 {
-	config* pconfig = (config*)user;
+	config* c = (config*)user;
 
 	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
 	if (MATCH("", "title"))
-		pconfig->title = strdup(value);
+		c->title = strdup(value);
 	else if (MATCH("", "core"))
-		pconfig->core = strdup(value);
+		c->core = strdup(value);
 	else if (MATCH("", "rom"))
-		pconfig->rom = strdup(value);
+		c->rom = strdup(value);
 	else if (MATCH("", "swap_interval"))
-		pconfig->swap_interval = atoi(value);
+		c->swap_interval = atoi(value);
 	else if (MATCH("", "fullscreen"))
-		pconfig->fullscreen = strcmp(value, "true") == 0;
+		c->fullscreen = strcmp(value, "true") == 0;
 	else if (MATCH("", "scale"))
-		pconfig->scale = atoi(value);
+		c->scale = atoi(value);
 	else if (MATCH("", "hide_cursor"))
-		pconfig->hide_cursor = strcmp(value, "true") == 0;
+		c->hide_cursor = strcmp(value, "true") == 0;
 	else if (MATCH("", "map_analog_to_dpad"))
-		pconfig->map_analog_to_dpad = strcmp(value, "true") == 0;
+		c->map_analog_to_dpad = strcmp(value, "true") == 0;
 	else
 		return 0;
 	return 1;

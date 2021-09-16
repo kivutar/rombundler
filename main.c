@@ -27,6 +27,7 @@ static void error_cb(int error, const char* description)
 }
 
 int main(int argc, char *argv[]) {
+	cfg_defaults(&g_cfg);
 	if (ini_parse("config.ini", cfg_handler, &g_cfg) < 0)
 		die("Could not parse config.ini");
 
