@@ -39,9 +39,9 @@ static struct {
 	GLint i_pos;
 	GLint i_coord;
 	GLint u_tex;
+	GLint u_tex_size;
 	GLint u_mvp;
-
-} g_shader = {0};
+} shader = {0};
 
 static const char *g_vshader_src =
 	"attribute vec2 i_pos;\n"
@@ -60,7 +60,36 @@ static const char *g_fshader_src =
 		"gl_FragColor = texture2D(u_tex, o_coord);\n"
 	"}";
 
-static GLuint compile_shader(unsigned type, unsigned count, const char **strings) {
+// static const char *g_fshader_src =
+// 	"uniform vec2 u_tex_size;\n"
+// 	"uniform sampler2D u_tex;\n"
+// 	"varying vec2 o_coord;\n"
+// 	"#define BLURSCALEX 0.45\n"
+// 	"#define LOWLUMSCAN 5.0\n"
+// 	"#define HILUMSCAN 10.0\n"
+// 	"#define BRIGHTBOOST 1.25\n"
+// 	"#define MASK_DARK 0.25\n"
+// 	"#define MASK_FADE 0.8\n"
+// 	"void main() {\n"
+// 		"float maskFade = 0.3333*MASK_FADE;\n"
+// 		"vec2 invDims = 1.0/u_tex_size.xy;\n"
+// 		"vec2 p = o_coord * u_tex_size;\n"
+// 		"vec2 i = floor(p) + 0.5;\n"
+// 		"vec2 f = p - i;\n"
+// 		"p = (i + 4.0*f*f*f)*invDims;\n"
+// 		"p.x = mix(p.x , o_coord.x, BLURSCALEX);\n"
+// 		"float Y = f.y*f.y;\n"
+// 		"float YY = Y*Y;\n"
+// 		"float whichmask = fract(o_coord.x*-0.4999);\n"
+// 		"float mask = 1.0 + float(whichmask < 0.5) * -MASK_DARK;\n"
+// 		"vec3 colour = texture2D(u_tex, p).rgb;\n"
+// 		"float scanLineWeight = (BRIGHTBOOST - LOWLUMSCAN*(Y - 2.05*YY));\n"
+// 		"float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);\n"
+// 		"gl_FragColor = vec4(colour.rgb*mix(scanLineWeight*mask, scanLineWeightB, dot(colour.rgb,vec3(maskFade))), 1.0);\n"
+// 	"}";
+
+static GLuint compile_shader(unsigned type, unsigned count, const char **strings)
+{
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, count, strings, NULL);
 	glCompileShader(shader);
@@ -77,7 +106,8 @@ static GLuint compile_shader(unsigned type, unsigned count, const char **strings
 	return shader;
 }
 
-void ortho2d(float m[4][4], float left, float right, float bottom, float top) {
+void ortho2d(float m[4][4], float left, float right, float bottom, float top)
+{
 	m[0][0] = 1; m[0][1] = 0; m[0][2] = 0; m[0][3] = 0;
 	m[1][0] = 0; m[1][1] = 1; m[1][2] = 0; m[1][3] = 0;
 	m[2][0] = 0; m[2][1] = 0; m[2][2] = 1; m[2][3] = 0;
@@ -90,7 +120,8 @@ void ortho2d(float m[4][4], float left, float right, float bottom, float top) {
 	m[3][1] = -(top + bottom) / (top - bottom);
 }
 
-static void init_shaders() {
+static void init_shaders()
+{
 	GLuint vshader = compile_shader(GL_VERTEX_SHADER, 1, &g_vshader_src);
 	GLuint fshader = compile_shader(GL_FRAGMENT_SHADER, 1, &g_fshader_src);
 	GLuint program = glCreateProgram();
@@ -109,24 +140,26 @@ static void init_shaders() {
 	GLint status;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 
-	if(status == GL_FALSE) {
+	if (status == GL_FALSE)
+	{
 		char buffer[4096];
 		glGetProgramInfoLog(program, sizeof(buffer), NULL, buffer);
 		die("Failed to link shader program: %s", buffer);
 	}
 
-	g_shader.program = program;
-	g_shader.i_pos   = glGetAttribLocation(program,  "i_pos");
-	g_shader.i_coord = glGetAttribLocation(program,  "i_coord");
-	g_shader.u_tex   = glGetUniformLocation(program, "u_tex");
-	g_shader.u_mvp   = glGetUniformLocation(program, "u_mvp");
+	shader.program    = program;
+	shader.i_pos      = glGetAttribLocation(program,  "i_pos");
+	shader.i_coord    = glGetAttribLocation(program,  "i_coord");
+	shader.u_tex      = glGetUniformLocation(program, "u_tex");
+	shader.u_tex_size = glGetUniformLocation(program, "u_tex_size");
+	shader.u_mvp      = glGetUniformLocation(program, "u_mvp");
 
-	glGenVertexArrays(1, &g_shader.vao);
-	glGenBuffers(1, &g_shader.vbo);
+	glGenVertexArrays(1, &shader.vao);
+	glGenBuffers(1, &shader.vbo);
 
-	glUseProgram(g_shader.program);
+	glUseProgram(shader.program);
 
-	glUniform1i(g_shader.u_tex, 0);
+	glUniform1i(shader.u_tex, 0);
 
 	float m[4][4];
 	// if (video.hw.bottom_left_origin)
@@ -134,12 +167,13 @@ static void init_shaders() {
 	// else
 		ortho2d(m, -1, 1, -1, 1);
 
-	glUniformMatrix4fv(g_shader.u_mvp, 1, GL_FALSE, (float*)m);
+	glUniformMatrix4fv(shader.u_mvp, 1, GL_FALSE, (float*)m);
 
 	glUseProgram(0);
 }
 
-void create_window(int width, int height) {
+void create_window(int width, int height)
+{
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
@@ -173,7 +207,8 @@ void create_window(int width, int height) {
 	glEnable(GL_TEXTURE_2D);
 }
 
-static void refresh_vertex_data() {
+static void refresh_vertex_data()
+{
 	assert(video.tex_w);
 	assert(video.tex_h);
 	assert(video.clip_w);
@@ -190,15 +225,15 @@ static void refresh_vertex_data() {
 		 1.0f,  1.0f, right,  0.0f,  // right-top
 	};
 
-	glBindVertexArray(g_shader.vao);
+	glBindVertexArray(shader.vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, g_shader.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, shader.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
 
-	glEnableVertexAttribArray(g_shader.i_pos);
-	glEnableVertexAttribArray(g_shader.i_coord);
-	glVertexAttribPointer(g_shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
-	glVertexAttribPointer(g_shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
+	glEnableVertexAttribArray(shader.i_pos);
+	glEnableVertexAttribArray(shader.i_coord);
+	glVertexAttribPointer(shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
+	glVertexAttribPointer(shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -238,7 +273,8 @@ static void init_framebuffer(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh) {
+static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh)
+{
 	*dw = sw;
 	*dh = sh;
 
@@ -251,7 +287,8 @@ static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh) {
 		*dh = *dw / ratio;
 }
 
-void video_configure(const struct retro_game_geometry *geom) {
+void video_configure(const struct retro_game_geometry *geom)
+{
 	int nwidth, nheight;
 
 	resize_to_aspect(geom->aspect_ratio, geom->base_width * 1, geom->base_height * 1, &nwidth, &nheight);
@@ -296,7 +333,17 @@ void video_configure(const struct retro_game_geometry *geom) {
 	//video.hw.context_reset();
 }
 
-bool video_set_pixel_format(unsigned format) {
+void video_set_geometry(const struct retro_game_geometry *geom)
+{
+	video.tex_w = geom->max_width;
+	video.tex_h = geom->max_height;
+	video.clip_w = geom->base_width;
+	video.clip_h = geom->base_height;
+	// printf("%d %d\n", video.clip_w, video.clip_h);
+}
+
+bool video_set_pixel_format(unsigned format)
+{
 	if (video.tex_id)
 		die("Tried to change pixel format after initialization.");
 
@@ -323,8 +370,10 @@ bool video_set_pixel_format(unsigned format) {
 	return true;
 }
 
-void video_refresh(const void *data, unsigned width, unsigned height, size_t pitch) {
-	if (video.clip_w != width || video.clip_h != height) {
+void video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)
+{
+	if (video.clip_w != width || video.clip_h != height)
+	{
 		video.clip_h = height;
 		video.clip_w = width;
 
@@ -334,9 +383,8 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
-	if (pitch != video.pitch) {
+	if (pitch != video.pitch)
 		video.pitch = pitch;
-	}
 
 	if (data)
 	{
@@ -345,40 +393,43 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 	}
 }
 
-void video_render() {
+void video_render()
+{
 	int w = 0, h = 0;
 	glfwGetFramebufferSize(window, &w, &h);
 	glViewport(0, 0, w, h);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(g_shader.program);
+	glUseProgram(shader.program);
+	glUniform2f(shader.u_tex_size, (float)video.clip_w, (float)video.clip_h);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
-	glBindVertexArray(g_shader.vao);
+	glBindVertexArray(shader.vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 
 	glUseProgram(0);
 }
 
-void video_deinit() {
+void video_deinit()
+{
 	if (video.fbo_id)
 		glDeleteFramebuffers(1, &video.fbo_id);
 
 	if (video.tex_id)
 		glDeleteTextures(1, &video.tex_id);
 
-	if (g_shader.vao)
-		glDeleteVertexArrays(1, &g_shader.vao);
+	if (shader.vao)
+		glDeleteVertexArrays(1, &shader.vao);
 
-	if (g_shader.vbo)
-		glDeleteBuffers(1, &g_shader.vbo);
+	if (shader.vbo)
+		glDeleteBuffers(1, &shader.vbo);
 
-	if (g_shader.program)
-		glDeleteProgram(g_shader.program);
+	if (shader.program)
+		glDeleteProgram(shader.program);
 
 	glfwDestroyWindow(window);
 }

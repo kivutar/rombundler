@@ -77,8 +77,6 @@ static retro_time_t get_time_usec() {
 	return tv.tv_sec*(int64_t)1000000+tv.tv_usec;
 }
 
-
-
 static bool core_environment(unsigned cmd, void *data) {
 	switch (cmd) {
 		case RETRO_ENVIRONMENT_GET_LOG_INTERFACE: {
@@ -115,6 +113,11 @@ static bool core_environment(unsigned cmd, void *data) {
 		case RETRO_ENVIRONMENT_GET_PERF_INTERFACE: {
 			struct retro_perf_callback *perf_cb = (struct retro_perf_callback*)data;
 			perf_cb->get_time_usec = get_time_usec;
+		}
+		break;
+		case RETRO_ENVIRONMENT_SET_GEOMETRY: {
+			const struct retro_game_geometry *geom = (const struct retro_game_geometry*)data;
+			video_set_geometry(geom);
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_VARIABLE: {
