@@ -47,6 +47,8 @@ static struct {
 	void (*retro_run)(void);
 	bool (*retro_load_game)(const struct retro_game_info *game);
 	void (*retro_unload_game)(void);
+	void* (*retro_get_memory_data)(unsigned);
+	size_t (*retro_get_memory_size)(unsigned);
 } core;
 
 static struct retro_frame_time_callback runloop_frame_time;
@@ -126,10 +128,6 @@ static bool core_environment(unsigned cmd, void *data) {
 		}
 		case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
 			const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;
-
-			if (*fmt > RETRO_PIXEL_FORMAT_RGB565)
-				return false;
-
 			return video_set_pixel_format(*fmt);
 		}
 		case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
@@ -171,6 +169,8 @@ void core_load(const char *sofile) {
 	load_retro_sym(retro_run);
 	load_retro_sym(retro_load_game);
 	load_retro_sym(retro_unload_game);
+	load_retro_sym(retro_get_memory_data);
+	load_retro_sym(retro_get_memory_size);
 
 	load_sym(set_environment, retro_set_environment);
 	load_sym(set_video_refresh, retro_set_video_refresh);
@@ -237,6 +237,16 @@ void core_run() {
 	core.retro_run();
 }
 
+size_t core_get_memory_size(unsigned id)
+{
+	return core.retro_get_memory_size(id);
+}
+
+void *core_get_memory_data(unsigned id)
+{
+	return core.retro_get_memory_data(id);
+}
+
 void core_unload() {
 	if (core.initialized)
 		core.retro_deinit();
@@ -244,5 +254,3 @@ void core_unload() {
 	if (core.handle)
 		close_lib(core.handle);
 }
-
-

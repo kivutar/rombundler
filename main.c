@@ -16,6 +16,7 @@
 #include "video.h"
 #include "input.h"
 #include "ini.h"
+#include "srm.h"
 #include "utils.h"
 
 extern GLFWwindow *window;
@@ -41,16 +42,23 @@ int main(int argc, char *argv[]) {
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
 
+	srm_load();
+
 	glfwSwapInterval(g_cfg.swap_interval);
 
+	unsigned frame = 0;
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		input_poll();
 		core_run();
 		video_render();
 		glfwSwapBuffers(window);
+		frame++;
+		if (frame % 600 == 0)
+			srm_save();
 	}
 
+	srm_save();
 	core_unload();
 	audio_deinit();
 	video_deinit();
