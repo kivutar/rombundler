@@ -3,7 +3,7 @@ VERSION ?= devel
 
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll
+	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
 	OS ?= Windows
 else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	TARGET := rombundler.exe
