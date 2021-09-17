@@ -14,7 +14,6 @@
 #define glBindVertexArray glBindVertexArrayAPPLE
 #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
 #define glBindFramebuffer glBindFramebufferEXT
-#define glBindFramebuffer glBindFramebufferEXT
 #define glGenFramebuffers glGenFramebuffersEXT
 #define glGenRenderbuffers glGenRenderbuffersEXT
 #define glBindRenderbuffer glBindRenderbufferEXT
