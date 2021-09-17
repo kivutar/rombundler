@@ -57,11 +57,11 @@ If you need special options for the emulator, you can set them by creating a opt
 
  * Static linking for Linux
  * Switch full screen / windowed
+ * Provide an OSX .app
  * Fix aspect ratio
  * Shaders
  * Hide Windows console
  * Multitap option
- * GL cores
 
 # Known working cores
 
@@ -77,10 +77,13 @@ If you need special options for the emulator, you can set them by creating a opt
  * mgba_libretro
  * gambatte_libretro
  * gearsystem_libretro
+ * mednafen_psx_libretro
+ * pcsx_rearmed_libretro
+ * melonds_libretro
 
 Not yet compatible:
 
- * Any GL core (not implemented)
+ * some GL cores
  * md_libretro (input issues)
  * sameboy_libretro (audio issues)
- * pcsx_rearmed_libretro (resolution switch not implemented)
+ * mupen64plus_next (various issues)

@@ -54,7 +54,8 @@ static struct {
 static struct retro_frame_time_callback runloop_frame_time;
 static retro_usec_t runloop_frame_time_last = 0;
 
-static void core_log(enum retro_log_level level, const char *fmt, ...) {
+static void core_log(enum retro_log_level level, const char *fmt, ...)
+{
 	char buffer[4096] = {0};
 	static const char * levelstr[] = { "dbg", "inf", "wrn", "err" };
 	va_list va;
@@ -68,18 +69,17 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
 
 	fprintf(stderr, "[%s] %s", levelstr[level], buffer);
 	fflush(stderr);
-
-	if (level == RETRO_LOG_ERROR)
-		exit(EXIT_FAILURE);
 }
 
-static retro_time_t get_time_usec() {
+static retro_time_t get_time_usec()
+{
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
 	return tv.tv_sec*(int64_t)1000000+tv.tv_usec;
 }
 
-static bool core_environment(unsigned cmd, void *data) {
+static bool core_environment(unsigned cmd, void *data)
+{
 	switch (cmd) {
 		case RETRO_ENVIRONMENT_GET_LOG_INTERFACE: {
 			struct retro_log_callback *cb = (struct retro_log_callback *)data;
@@ -87,23 +87,27 @@ static bool core_environment(unsigned cmd, void *data) {
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_CAN_DUPE: {
-			bool *bval = (bool*)data;
-			*bval = true;
+			*(bool*)data = true;
+		}
+		break;
+		case RETRO_ENVIRONMENT_GET_LANGUAGE: {
+			*(unsigned*)data = RETRO_LANGUAGE_ENGLISH;
+		}
+		break;
+		case RETRO_ENVIRONMENT_GET_USERNAME: {
+			*(const char**)data = NULL;
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_FASTFORWARDING: {
-			bool *bval = (bool*)data;
-			*bval = false;
+			*(bool*)data = false;
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE: {
-			bool *bval = (bool*)data;
-			*bval = false;
+			*(bool*)data = false;
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE: {
-			int *value = (int*)data;
-			*value = 1 << 0 | 1 << 1;
+			*(int*)data = 1 << 0 | 1 << 1;
 		}
 		break;
 		case RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK: {
@@ -122,18 +126,40 @@ static bool core_environment(unsigned cmd, void *data) {
 			video_set_geometry(geom);
 		}
 		break;
+		case RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION: {
+			*(unsigned *)data = 0;
+		}
+		break;
+		case RETRO_ENVIRONMENT_GET_PREFERRED_HW_RENDER: {
+			// printf("RETRO_ENVIRONMENT_GET_PREFERRED_HW_RENDER: RETRO_HW_CONTEXT_OPENGL\n");
+			*(unsigned *)data = RETRO_HW_CONTEXT_OPENGL;
+		}
+		break;
+		case RETRO_ENVIRONMENT_SET_HW_RENDER: {
+			struct retro_hw_render_callback *hw = (struct retro_hw_render_callback*)data;
+			hw->get_current_framebuffer = video_get_current_framebuffer;
+			hw->get_proc_address = (retro_hw_get_proc_address_t)glfwGetProcAddress;
+			video_set_hw(*hw);
+			// printf("RETRO_ENVIRONMENT_SET_HW_RENDER: %d\n", hw->context_type);
+		}
+		break;
+		case RETRO_ENVIRONMENT_SET_VARIABLES: {
+			return true;
+		}
 		case RETRO_ENVIRONMENT_GET_VARIABLE: {
 			struct retro_variable *var = (struct retro_variable*) data;
 			return get_option(var->key, &var->value);
 		}
+		break;
 		case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
 			const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;
 			return video_set_pixel_format(*fmt);
 		}
+		break;
 		case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
 		case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY:
 			*(const char **)data = ".";
-			return true;
+		break;
 
 		default:
 			core_log(RETRO_LOG_DEBUG, "Unhandled env #%u", cmd);
@@ -145,7 +171,8 @@ static bool core_environment(unsigned cmd, void *data) {
 
 void input_poll_dummy(void) {}
 
-void core_load(const char *sofile) {
+void core_load(const char *sofile)
+{
 	void (*set_environment)(retro_environment_t) = NULL;
 	void (*set_video_refresh)(retro_video_refresh_t) = NULL;
 	void (*set_input_poll)(retro_input_poll_t) = NULL;
@@ -190,7 +217,8 @@ void core_load(const char *sofile) {
 	core.initialized = true;
 }
 
-void core_load_game(const char *filename) {
+void core_load_game(const char *filename)
+{
 	struct retro_system_av_info av = {0};
 	struct retro_system_info si = {0};
 	struct retro_game_info info = { filename, 0 };
@@ -223,7 +251,8 @@ void core_load_game(const char *filename) {
 	return;
 }
 
-void core_run() {
+void core_run()
+{
 	if (runloop_frame_time.callback) {
 		retro_time_t current = get_time_usec();
 		retro_time_t delta = current - runloop_frame_time_last;
@@ -247,7 +276,8 @@ void *core_get_memory_data(unsigned id)
 	return core.retro_get_memory_data(id);
 }
 
-void core_unload() {
+void core_unload()
+{
 	if (core.initialized)
 		core.retro_deinit();
 

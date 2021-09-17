@@ -13,6 +13,21 @@
 #define glGenVertexArrays glGenVertexArraysAPPLE
 #define glBindVertexArray glBindVertexArrayAPPLE
 #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
+#define glBindFramebuffer glBindFramebufferEXT
+#define glGenFramebuffers glGenFramebuffersEXT
+#define glGenRenderbuffers glGenRenderbuffersEXT
+#define glBindRenderbuffer glBindRenderbufferEXT
+#define glFramebufferTexture2D glFramebufferTexture2DEXT
+#define glCheckFramebufferStatus glCheckFramebufferStatusEXT
+#define glRenderbufferStorage glRenderbufferStorageEXT
+#define glFramebufferRenderbuffer glFramebufferRenderbufferEXT
+#define GL_FRAMEBUFFER GL_FRAMEBUFFER_EXT
+#define GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT0_EXT
+#define GL_RENDERBUFFER GL_RENDERBUFFER_EXT
+#define GL_FRAMEBUFFER_COMPLETE GL_FRAMEBUFFER_COMPLETE_EXT
+#define GL_DEPTH_ATTACHMENT GL_DEPTH_ATTACHMENT_EXT
+#define GL_STENCIL_ATTACHMENT GL_STENCIL_ATTACHMENT_EXT
+#define GL_DEPTH24_STENCIL8 GL_DEPTH24_STENCIL8_EXT
 #endif
 
 GLFWwindow *window = NULL;
@@ -30,6 +45,8 @@ static struct {
 	GLuint pixfmt;
 	GLuint pixtype;
 	GLuint bpp;
+
+	struct retro_hw_render_callback hw;
 } video = {0};
 
 static struct {
@@ -163,9 +180,9 @@ static void init_shaders()
 	glUniform1i(shader.u_tex, 0);
 
 	float m[4][4];
-	// if (video.hw.bottom_left_origin)
-	// 	ortho2d(m, -1, 1, 1, -1);
-	// else
+	if (video.hw.bottom_left_origin)
+		ortho2d(m, -1, 1, 1, -1);
+	else
 		ortho2d(m, -1, 1, -1, 1);
 
 	glUniformMatrix4fv(shader.u_mvp, 1, GL_FALSE, (float*)m);
@@ -175,9 +192,30 @@ static void init_shaders()
 
 void create_window(int width, int height)
 {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	if (video.hw.context_type == RETRO_HW_CONTEXT_OPENGL_CORE || video.hw.version_major >= 3) {
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, video.hw.version_major);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, video.hw.version_minor);
+	}
+	else
+	{
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	}
+
+	switch (video.hw.context_type) {
+		case RETRO_HW_CONTEXT_OPENGL_CORE:
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			break;
+		case RETRO_HW_CONTEXT_OPENGLES2:
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+			break;
+		case RETRO_HW_CONTEXT_OPENGL:
+			if (video.hw.version_major >= 3)
+				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+			break;
+		default:
+			die("Unsupported hw context %i. (only OPENGL, OPENGL_CORE and OPENGLES2 supported)", video.hw.context_type);
+	}
 
 	GLFWmonitor* monitor = NULL;
 	if (g_cfg.fullscreen)
@@ -198,8 +236,13 @@ void create_window(int width, int height)
 
 	glfwMakeContextCurrent(window);
 
-	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-		die("Failed to initialize glad");
+	// if (video.hw.context_type == RETRO_HW_CONTEXT_OPENGLES2) {
+	// 	if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress))
+	// 		die("Failed to initialize glad.");
+	// } else {
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+			die("Failed to initialize glad.");
+	// }
 
 	init_shaders();
 
@@ -247,13 +290,16 @@ static void init_framebuffer(int width, int height)
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, video.tex_id, 0);
 
-	/*f (video.hw.depth && video.hw.stencil) {
+	if (video.hw.depth && video.hw.stencil)
+	{
 		glGenRenderbuffers(1, &video.rbo_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, video.rbo_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, video.rbo_id);
-	} else if (video.hw.depth) {
+	}
+	else if (video.hw.depth)
+	{
 		glGenRenderbuffers(1, &video.rbo_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, video.rbo_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
@@ -262,9 +308,7 @@ static void init_framebuffer(int width, int height)
 	}
 
 	if (video.hw.depth || video.hw.stencil)
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);*/
-
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -288,6 +332,18 @@ static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh)
 		*dh = *dw / ratio;
 }
 
+uintptr_t video_get_current_framebuffer()
+{
+	return video.fbo_id;
+}
+
+void video_set_hw(struct retro_hw_render_callback hw)
+{
+	video.hw = hw;
+}
+
+static void noop() {}
+
 void video_configure(const struct retro_game_geometry *geom)
 {
 	int nwidth, nheight;
@@ -296,6 +352,12 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	nwidth *= g_cfg.scale;
 	nheight *= g_cfg.scale;
+
+	video.hw.version_major   = 2;
+	video.hw.version_minor   = 1;
+	video.hw.context_type    = RETRO_HW_CONTEXT_OPENGL;
+	video.hw.context_reset   = noop;
+	video.hw.context_destroy = noop;
 
 	if (!window)
 		create_window(nwidth, nheight);
@@ -322,7 +384,7 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//init_framebuffer(geom->max_width, geom->max_height);
+	init_framebuffer(geom->max_width, geom->max_height);
 
 	video.tex_w = geom->max_width;
 	video.tex_h = geom->max_height;
@@ -331,7 +393,7 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	refresh_vertex_data();
 
-	//video.hw.context_reset();
+	video.hw.context_reset();
 }
 
 void video_set_geometry(const struct retro_game_geometry *geom)
@@ -341,6 +403,19 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
 	printf("set geom %dx%d\n", video.clip_w, video.clip_h);
+
+	if (window) {
+		refresh_vertex_data();
+
+		int ow = 0, oh = 0;
+		resize_to_aspect(geom->aspect_ratio, geom->base_width, geom->base_height, &ow, &oh);
+
+		// ow *= g_cfg.scale;
+		// oh *= g_cfg.scale;
+
+		// if (!g_cfg.fullscreen)
+		// 	glfwSetWindowSize(window, ow, oh);
+	}
 }
 
 bool video_set_pixel_format(unsigned format)
@@ -399,6 +474,7 @@ void video_render()
 	glfwGetFramebufferSize(window, &w, &h);
 	glViewport(0, 0, w, h);
 
+	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(shader.program);
