@@ -60,7 +60,6 @@ If you need special options for the emulator, you can set them by creating a opt
  * Provide an OSX .app
  * Fix aspect ratio
  * Shaders
- * Hide Windows console
  * Multitap option
 
 # Known working cores
