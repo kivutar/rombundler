@@ -3,7 +3,6 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/time.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
