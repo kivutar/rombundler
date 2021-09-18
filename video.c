@@ -364,6 +364,11 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
 
+	if (!video.clip_w)
+		video.clip_w = video.tex_w;
+	if (!video.clip_h)
+		video.clip_h = video.tex_h;
+
 	refresh_vertex_data();
 
 	video.hw.context_reset();
@@ -375,6 +380,12 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
+
+	if (!video.clip_w)
+		video.clip_w = video.tex_w;
+	if (!video.clip_h)
+		video.clip_h = video.tex_h;
+
 	printf("Set geom %dx%d\n", video.clip_w, video.clip_h);
 
 	if (window) {
@@ -427,6 +438,12 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 	video.clip_h = height;
 	video.clip_w = width;
 	video.pitch = pitch;
+
+	if (!video.clip_w)
+		video.clip_w = video.tex_w;
+	if (!video.clip_h)
+		video.clip_h = video.tex_h;
+
 	refresh_vertex_data();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
