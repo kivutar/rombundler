@@ -81,7 +81,6 @@ We recommand using the linear filter with the CRT and LCD shaders.
  * Switch full screen / windowed
  * Provide an OSX .app
  * Fix aspect ratio
- * Shaders
  * Multitap option
 
 # Known working cores
