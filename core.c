@@ -248,6 +248,11 @@ void core_load_game(const char *filename)
 	video_configure(&av.geometry);
 	audio_init(av.timing.sample_rate);
 
+	core.retro_set_controller_port_device(0, RETRO_DEVICE_JOYPAD);
+	core.retro_set_controller_port_device(1, RETRO_DEVICE_JOYPAD);
+	core.retro_set_controller_port_device(2, RETRO_DEVICE_JOYPAD);
+	core.retro_set_controller_port_device(3, RETRO_DEVICE_JOYPAD);
+
 	return;
 }
 
