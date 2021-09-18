@@ -100,6 +100,9 @@ We recommand using the linear filter with the CRT and LCD shaders.
  * mednafen_psx_libretro
  * pcsx_rearmed_libretro
  * melonds_libretro
+ * swanstation_libretro
+ * duckstation_libretro
+ * fbneo_libretro
 
 Not yet compatible:
 
