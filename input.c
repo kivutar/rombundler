@@ -60,10 +60,10 @@ void input_poll(void) {
 				for (i = 0; i < 11; i++)
 					state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
 
+			int count;
+			const float *axes = glfwGetJoystickAxes(port, &count);
 			if (g_cfg.map_analog_to_dpad)
 			{
-				int count;
-				const float *axes = glfwGetJoystickAxes(port, &count);
 				if (count >= 2)
 				{
 					state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] = axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
@@ -72,6 +72,9 @@ void input_poll(void) {
 					state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] = axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
 				}
 			}
+
+			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
+			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
 		}
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
