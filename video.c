@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -8,6 +9,7 @@
 #include "libretro.h"
 #include "config.h"
 #include "utils.h"
+#include "shaders.h"
 
 #ifdef __APPLE__
 #define glGenVertexArrays glGenVertexArraysAPPLE
@@ -61,51 +63,6 @@ static struct {
 	GLint u_mvp;
 } shader = {0};
 
-static const char *g_vshader_src =
-	"attribute vec2 i_pos;\n"
-	"attribute vec2 i_coord;\n"
-	"varying vec2 o_coord;\n"
-	"uniform mat4 u_mvp;\n"
-	"void main() {\n"
-		"o_coord = i_coord;\n"
-		"gl_Position = vec4(i_pos, 0.0, 1.0) * u_mvp;\n"
-	"}";
-
-static const char *g_fshader_src =
-	"varying vec2 o_coord;\n"
-	"uniform sampler2D u_tex;\n"
-	"void main() {\n"
-		"gl_FragColor = texture2D(u_tex, o_coord);\n"
-	"}";
-
-// static const char *g_fshader_src =
-// 	"uniform vec2 u_tex_size;\n"
-// 	"uniform sampler2D u_tex;\n"
-// 	"varying vec2 o_coord;\n"
-// 	"#define BLURSCALEX 0.45\n"
-// 	"#define LOWLUMSCAN 5.0\n"
-// 	"#define HILUMSCAN 10.0\n"
-// 	"#define BRIGHTBOOST 1.25\n"
-// 	"#define MASK_DARK 0.25\n"
-// 	"#define MASK_FADE 0.8\n"
-// 	"void main() {\n"
-// 		"float maskFade = 0.3333*MASK_FADE;\n"
-// 		"vec2 invDims = 1.0/u_tex_size.xy;\n"
-// 		"vec2 p = o_coord * u_tex_size;\n"
-// 		"vec2 i = floor(p) + 0.5;\n"
-// 		"vec2 f = p - i;\n"
-// 		"p = (i + 4.0*f*f*f)*invDims;\n"
-// 		"p.x = mix(p.x , o_coord.x, BLURSCALEX);\n"
-// 		"float Y = f.y*f.y;\n"
-// 		"float YY = Y*Y;\n"
-// 		"float whichmask = fract(o_coord.x*-0.4999);\n"
-// 		"float mask = 1.0 + float(whichmask < 0.5) * -MASK_DARK;\n"
-// 		"vec3 colour = texture2D(u_tex, p).rgb;\n"
-// 		"float scanLineWeight = (BRIGHTBOOST - LOWLUMSCAN*(Y - 2.05*YY));\n"
-// 		"float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);\n"
-// 		"gl_FragColor = vec4(colour.rgb*mix(scanLineWeight*mask, scanLineWeightB, dot(colour.rgb,vec3(maskFade))), 1.0);\n"
-// 	"}";
-
 static GLuint compile_shader(unsigned type, unsigned count, const char **strings)
 {
 	GLuint shader = glCreateShader(type);
@@ -140,8 +97,14 @@ void ortho2d(float m[4][4], float left, float right, float bottom, float top)
 
 static void init_shaders()
 {
-	GLuint vshader = compile_shader(GL_VERTEX_SHADER, 1, &g_vshader_src);
-	GLuint fshader = compile_shader(GL_FRAGMENT_SHADER, 1, &g_fshader_src);
+	GLuint vshader = compile_shader(GL_VERTEX_SHADER, 1, &vshader_default_src);
+	GLuint fshader = 0;
+	if (strcmp(g_cfg.shader, "zfast-crt") == 0)
+		fshader = compile_shader(GL_FRAGMENT_SHADER, 1, &fshader_zfastcrt_src);
+	else if (strcmp(g_cfg.shader, "zfast-lcd") == 0)
+		fshader = compile_shader(GL_FRAGMENT_SHADER, 1, &fshader_zfastlcd_src);
+	else
+		fshader = compile_shader(GL_FRAGMENT_SHADER, 1, &fshader_default_src);
 	GLuint program = glCreateProgram();
 
 	assert(program);
@@ -380,8 +343,12 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	int filter = GL_NEAREST;
+	if (strcmp(g_cfg.filter, "linear") == 0)
+		filter = GL_LINEAR;
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 

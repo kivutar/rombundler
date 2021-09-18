@@ -7,6 +7,8 @@
 void cfg_defaults(config *c)
 {
 	c->title = "ROMBundler";
+	c->shader = "default";
+	c->filter = "nearest";
 	c->fullscreen = false;
 	c->scale = 3;
 	c->swap_interval = 1;
@@ -25,6 +27,10 @@ int cfg_handler(void* user, const char* section, const char* name, const char* v
 		c->core = strdup(value);
 	else if (MATCH("", "rom"))
 		c->rom = strdup(value);
+	else if (MATCH("", "shader"))
+		c->shader = strdup(value);
+	else if (MATCH("", "filter"))
+		c->filter = strdup(value);
 	else if (MATCH("", "swap_interval"))
 		c->swap_interval = atoi(value);
 	else if (MATCH("", "fullscreen"))

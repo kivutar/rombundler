@@ -47,11 +47,33 @@ ROMBundler will read the ini file, load the emulator and the ROM and the game wi
 
 You can then rename `rombundler` with the name of your game, change it's icon, and distribute this as a zip.
 
+## Emulator configuration
+
 If you need special options for the emulator, you can set them by creating a options.ini file like this:
 
     fceumm_sndvolume = 7
     fceumm_palette = default
     fceumm_ntsc_filter = composite
+
+## Shaders
+
+In the config.ini, you can specify a single pass shader. For example:
+
+    shader = zfast-crt
+    filter = linear
+
+Default values are
+
+    shader = default
+    filter = nearest
+
+For now available shaders are:
+
+ * default
+ * zfast-crt
+ * zfast-lcd
+
+We recommand using the linear filter with the CRT and LCD shaders.
 
 # TODO
 

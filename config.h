@@ -5,6 +5,8 @@ typedef struct
 	const char* title;
     const char* core;
     const char* rom;
+    const char* shader;
+    const char* filter;
     int swap_interval;
     bool fullscreen;
     int scale;
