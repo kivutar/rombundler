@@ -365,7 +365,11 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.tex_id = 0;
 
 	if (!video.pixfmt)
+	{
 		video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
+		video.pixtype = GL_BGRA;
+		video.bpp = 2;
+	}
 
 	glGenTextures(1, &video.tex_id);
 
@@ -378,6 +382,8 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, geom->max_width, geom->max_height, 0,
 			video.pixtype, video.pixfmt, NULL);
@@ -402,7 +408,7 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
-	printf("set geom %dx%d\n", video.clip_w, video.clip_h);
+	printf("Set geom %dx%d\n", video.clip_w, video.clip_h);
 
 	if (window) {
 		refresh_vertex_data();
@@ -443,29 +449,25 @@ bool video_set_pixel_format(unsigned format)
 			die("Unknown pixel type %u", format);
 	}
 
+	if (video.pitch)
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
+
 	return true;
 }
 
 void video_refresh(const void *data, unsigned width, unsigned height, size_t pitch)
 {
-	if (video.clip_w != width || video.clip_h != height)
-	{
-		video.clip_h = height;
-		video.clip_w = width;
-		refresh_vertex_data();
-	}
+	video.clip_h = height;
+	video.clip_w = width;
+	video.pitch = pitch;
+	refresh_vertex_data();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
-
-	if (pitch != video.pitch)
-		video.pitch = pitch;
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
 
 	if (data)
-	{
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, video.pixtype, video.pixfmt, data);
-	}
 }
 
 void video_render()
