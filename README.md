@@ -106,7 +106,8 @@ We recommand using the linear filter with the CRT and LCD shaders.
 
 Not yet compatible:
 
- * some GL cores
  * md_libretro (input issues)
  * sameboy_libretro (audio issues)
- * mupen64plus_next (various issues)
+ * mupen64plus_next_libretro (various issues)
+ * parallel_n64_libretro (various issues)
+ * ppsspp_libretro (GL issues)
