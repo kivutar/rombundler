@@ -362,7 +362,6 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.clip_h = geom->base_height;
 	video.pitch = geom->base_width * video.bpp;
 	video.aspect_ratio = g_cfg.aspect_ratio ? g_cfg.aspect_ratio : geom->aspect_ratio;
-	printf("%f %f\n", video.aspect_ratio, geom->aspect_ratio);
 
 	if (!video.clip_w)
 		video.clip_w = video.tex_w;
