@@ -33,9 +33,11 @@ Then modify the config.ini to fit your needs:
     rom = ./Shrine Maiden Shizuka Demo 2.md
     swap_interval = 1
     full_screen = false
-    scale = 3
     hide_cursor = false
     map_analog_to_dpad = true
+    window_width = 800
+    window_height = 600
+    aspect_ratio = 1.333333
 
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 

@@ -317,7 +317,6 @@ static void noop() {}
 
 void video_configure(const struct retro_game_geometry *geom)
 {
-	video.aspect_ratio = geom->aspect_ratio;
 	video.hw.version_major   = 2;
 	video.hw.version_minor   = 1;
 	video.hw.context_type    = RETRO_HW_CONTEXT_OPENGL;
@@ -325,7 +324,7 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.hw.context_destroy = noop;
 
 	if (!window)
-		create_window(800, 600);
+		create_window(g_cfg.window_width, g_cfg.window_height);
 
 	video.tex_id = 0;
 
@@ -340,8 +339,6 @@ void video_configure(const struct retro_game_geometry *geom)
 
 	if (!video.tex_id)
 		die("Failed to create the video texture");
-
-	video.pitch = geom->base_width * video.bpp;
 
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
@@ -363,6 +360,9 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
+	video.pitch = geom->base_width * video.bpp;
+	video.aspect_ratio = g_cfg.aspect_ratio ? g_cfg.aspect_ratio : geom->aspect_ratio;
+	printf("%f %f\n", video.aspect_ratio, geom->aspect_ratio);
 
 	if (!video.clip_w)
 		video.clip_w = video.tex_w;
@@ -380,7 +380,7 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
-	video.aspect_ratio = geom->aspect_ratio;
+	video.aspect_ratio = g_cfg.aspect_ratio ? g_cfg.aspect_ratio : geom->aspect_ratio;
 
 	if (!video.clip_w)
 		video.clip_w = video.tex_w;
@@ -414,9 +414,6 @@ bool video_set_pixel_format(unsigned format)
 		default:
 			die("Unknown pixel type %u", format);
 	}
-
-	if (video.pitch)
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
 
 	return true;
 }

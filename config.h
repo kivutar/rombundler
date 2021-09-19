@@ -9,7 +9,9 @@ typedef struct
     const char* filter;
     int swap_interval;
     bool fullscreen;
-    int scale;
+    int window_width;
+    int window_height;
+    float aspect_ratio;
     bool hide_cursor;
     bool map_analog_to_dpad;
 } config;
