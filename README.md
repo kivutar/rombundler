@@ -79,10 +79,9 @@ We recommand using the linear filter with the CRT and LCD shaders.
 
 # TODO
 
+ * Provide an OSX .app
  * Static linking for Linux
  * Switch full screen / windowed
- * Provide an OSX .app
- * Fix aspect ratio
  * Multitap option
 
 # Known working cores
