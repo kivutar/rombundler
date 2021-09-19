@@ -10,7 +10,9 @@ void cfg_defaults(config *c)
 	c->shader = "default";
 	c->filter = "nearest";
 	c->fullscreen = false;
-	c->scale = 3;
+	c->window_width = 800;
+	c->window_height = 600;
+	c->aspect_ratio = 4.0 / 3.0;
 	c->swap_interval = 1;
 	c->hide_cursor = false;
 	c->map_analog_to_dpad = true;
@@ -33,10 +35,14 @@ int cfg_handler(void* user, const char* section, const char* name, const char* v
 		c->filter = strdup(value);
 	else if (MATCH("", "swap_interval"))
 		c->swap_interval = atoi(value);
+	else if (MATCH("", "window_width"))
+		c->window_width = atoi(value);
+	else if (MATCH("", "window_height"))
+		c->window_height = atoi(value);
+	else if (MATCH("", "aspect_ratio"))
+		c->aspect_ratio = atof(value);
 	else if (MATCH("", "fullscreen"))
 		c->fullscreen = strcmp(value, "true") == 0;
-	else if (MATCH("", "scale"))
-		c->scale = atoi(value);
 	else if (MATCH("", "hide_cursor"))
 		c->hide_cursor = strcmp(value, "true") == 0;
 	else if (MATCH("", "map_analog_to_dpad"))

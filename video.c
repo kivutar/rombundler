@@ -43,6 +43,7 @@ static struct {
 	GLuint pitch;
 	GLint tex_w, tex_h;
 	GLuint clip_w, clip_h;
+	float aspect_ratio;
 
 	GLuint pixfmt;
 	GLuint pixtype;
@@ -81,7 +82,7 @@ static GLuint compile_shader(unsigned type, unsigned count, const char **strings
 	return shader;
 }
 
-void ortho2d(float m[4][4], float left, float right, float bottom, float top)
+static void ortho2d(float m[4][4], float left, float right, float bottom, float top)
 {
 	m[0][0] = 1; m[0][1] = 0; m[0][2] = 0; m[0][3] = 0;
 	m[1][0] = 0; m[1][1] = 1; m[1][2] = 0; m[1][3] = 0;
@@ -93,6 +94,59 @@ void ortho2d(float m[4][4], float left, float right, float bottom, float top)
 	m[2][2] = -1.0f;
 	m[3][0] = -(right + left) / (right - left);
 	m[3][1] = -(top + bottom) / (top - bottom);
+}
+
+static void core_ratio_viewport()
+{
+	int fbw = 0, fbh = 0;
+	glfwGetFramebufferSize(window, &fbw, &fbh);
+
+	float ffbw = (float)fbw;
+	float ffbh = (float)fbh;
+
+	if (video.aspect_ratio <= 0)
+		video.aspect_ratio = ffbw / ffbh;
+
+	float h = ffbh;
+	float w = ffbh * video.aspect_ratio;
+	if (w > ffbw)
+	{
+		h = ffbw / video.aspect_ratio;
+		w = ffbw;
+	}
+
+	float x = (ffbw - w) / 2.0;
+	float y = (ffbh - h) / 2.0;
+
+	float x1 = x;
+	float x2 = x;
+	float x3 = x + w;
+	float x4 = x + w;
+	float y1 = fbh - (y + h);
+	float y2 = fbh - y;
+	float y3 = fbh - (y + h);
+	float y4 = fbh - y;
+
+	float vertex_data[] = {
+		//  X, Y, U, V
+		x1/ffbw*2 - 1, y1/ffbh*2 - 1, 0, 1, // left-bottom
+		x2/ffbw*2 - 1, y2/ffbh*2 - 1, 0, 0, // left-top
+		x3/ffbw*2 - 1, y3/ffbh*2 - 1, 1, 1, // right-bottom
+		x4/ffbw*2 - 1, y4/ffbh*2 - 1, 1, 0, // right-top
+	};
+
+	glBindVertexArray(shader.vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, shader.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(shader.i_pos);
+	glEnableVertexAttribArray(shader.i_coord);
+	glVertexAttribPointer(shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
+	glVertexAttribPointer(shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 static void init_shaders()
@@ -214,38 +268,6 @@ void create_window(int width, int height)
 	glEnable(GL_TEXTURE_2D);
 }
 
-static void refresh_vertex_data()
-{
-	assert(video.tex_w);
-	assert(video.tex_h);
-	assert(video.clip_w);
-	assert(video.clip_h);
-
-	float bottom = (float)video.clip_h / video.tex_h;
-	float right  = (float)video.clip_w / video.tex_w;
-
-	float vertex_data[] = {
-		// pos, coord
-		-1.0f, -1.0f, 0.0f,  bottom, // left-bottom
-		-1.0f,  1.0f, 0.0f,  0.0f,   // left-top
-		 1.0f, -1.0f, right,  bottom,// right-bottom
-		 1.0f,  1.0f, right,  0.0f,  // right-top
-	};
-
-	glBindVertexArray(shader.vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, shader.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
-
-	glEnableVertexAttribArray(shader.i_pos);
-	glEnableVertexAttribArray(shader.i_coord);
-	glVertexAttribPointer(shader.i_pos, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0);
-	glVertexAttribPointer(shader.i_coord, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(2 * sizeof(float)));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 static void init_framebuffer(int width, int height)
 {
 	glGenFramebuffers(1, &video.fbo_id);
@@ -281,20 +303,6 @@ static void init_framebuffer(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-static void resize_to_aspect(double ratio, int sw, int sh, int *dw, int *dh)
-{
-	*dw = sw;
-	*dh = sh;
-
-	if (ratio <= 0)
-		ratio = (double)sw / sh;
-
-	if ((float)sw / sh < 1)
-		*dw = *dh * ratio;
-	else
-		*dh = *dw / ratio;
-}
-
 uintptr_t video_get_current_framebuffer()
 {
 	return video.fbo_id;
@@ -309,13 +317,6 @@ static void noop() {}
 
 void video_configure(const struct retro_game_geometry *geom)
 {
-	int nwidth, nheight;
-
-	resize_to_aspect(geom->aspect_ratio, geom->base_width * 1, geom->base_height * 1, &nwidth, &nheight);
-
-	nwidth *= g_cfg.scale;
-	nheight *= g_cfg.scale;
-
 	video.hw.version_major   = 2;
 	video.hw.version_minor   = 1;
 	video.hw.context_type    = RETRO_HW_CONTEXT_OPENGL;
@@ -323,7 +324,7 @@ void video_configure(const struct retro_game_geometry *geom)
 	video.hw.context_destroy = noop;
 
 	if (!window)
-		create_window(nwidth, nheight);
+		create_window(g_cfg.window_width, g_cfg.window_height);
 
 	video.tex_id = 0;
 
@@ -339,8 +340,6 @@ void video_configure(const struct retro_game_geometry *geom)
 	if (!video.tex_id)
 		die("Failed to create the video texture");
 
-	video.pitch = geom->base_width * video.bpp;
-
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 
 	int filter = GL_NEAREST;
@@ -355,21 +354,21 @@ void video_configure(const struct retro_game_geometry *geom)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, geom->max_width, geom->max_height, 0,
 			video.pixtype, video.pixfmt, NULL);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	init_framebuffer(geom->max_width, geom->max_height);
 
 	video.tex_w = geom->max_width;
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
+	video.pitch = geom->base_width * video.bpp;
+	video.aspect_ratio = g_cfg.aspect_ratio ? g_cfg.aspect_ratio : geom->aspect_ratio;
 
 	if (!video.clip_w)
 		video.clip_w = video.tex_w;
 	if (!video.clip_h)
 		video.clip_h = video.tex_h;
 
-	refresh_vertex_data();
+	core_ratio_viewport();
 
 	video.hw.context_reset();
 }
@@ -380,6 +379,7 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 	video.tex_h = geom->max_height;
 	video.clip_w = geom->base_width;
 	video.clip_h = geom->base_height;
+	video.aspect_ratio = g_cfg.aspect_ratio ? g_cfg.aspect_ratio : geom->aspect_ratio;
 
 	if (!video.clip_w)
 		video.clip_w = video.tex_w;
@@ -387,19 +387,6 @@ void video_set_geometry(const struct retro_game_geometry *geom)
 		video.clip_h = video.tex_h;
 
 	printf("Set geom %dx%d\n", video.clip_w, video.clip_h);
-
-	if (window) {
-		refresh_vertex_data();
-
-		int ow = 0, oh = 0;
-		resize_to_aspect(geom->aspect_ratio, geom->base_width, geom->base_height, &ow, &oh);
-
-		// ow *= g_cfg.scale;
-		// oh *= g_cfg.scale;
-
-		// if (!g_cfg.fullscreen)
-		// 	glfwSetWindowSize(window, ow, oh);
-	}
 }
 
 bool video_set_pixel_format(unsigned format)
@@ -427,9 +414,6 @@ bool video_set_pixel_format(unsigned format)
 			die("Unknown pixel type %u", format);
 	}
 
-	if (video.pitch)
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
-
 	return true;
 }
 
@@ -444,27 +428,33 @@ void video_refresh(const void *data, unsigned width, unsigned height, size_t pit
 	if (!video.clip_h)
 		video.clip_h = video.tex_h;
 
-	refresh_vertex_data();
+	core_ratio_viewport();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, video.pitch / video.bpp);
 
+	glUseProgram(shader.program);
+	glUniform2f(shader.u_tex_size, width, height);
+
 	if (data)
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, video.pixtype, video.pixfmt, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, video.pixtype, video.pixfmt, data);
+
+	glUseProgram(0);
 }
 
 void video_render()
 {
-	int w = 0, h = 0;
-	glfwGetFramebufferSize(window, &w, &h);
-	glViewport(0, 0, w, h);
-
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	int fbw = 0, fbh = 0;
+	glfwGetFramebufferSize(window, &fbw, &fbh);
+	glViewport(0, 0, fbw, fbh);
+
+	core_ratio_viewport();
+
 	glUseProgram(shader.program);
-	glUniform2f(shader.u_tex_size, (float)video.tex_w, (float)video.tex_h);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, video.tex_id);
