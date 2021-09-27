@@ -81,9 +81,32 @@ void input_poll(void) {
 		glfwSetWindowShouldClose(window, true);
 }
 
-int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id) {
-	if (port >= MAX_PLAYERS || index || device != RETRO_DEVICE_JOYPAD)
-		return 0;
+static double oldx = 0;
+static double oldy = 0;
 
-	return state[port][id];
+int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id) {
+	if (port < MAX_PLAYERS && device == RETRO_DEVICE_JOYPAD)
+		return state[port][id];
+
+	if (device == RETRO_DEVICE_MOUSE) {
+		double x = 0;
+		double y = 0;
+		glfwGetCursorPos(window, &x, &y);
+		if (id == RETRO_DEVICE_ID_MOUSE_X)
+		{
+			int16_t d = x - oldx;
+			oldx = x;
+			return d;
+		}
+		if (id == RETRO_DEVICE_ID_MOUSE_Y)
+		{
+			int16_t d = y - oldy;
+			oldy = y;
+			return d;
+		}
+		if (id == RETRO_DEVICE_ID_MOUSE_LEFT && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+			return 1;
+	}
+
+	return 0;
 }
