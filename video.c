@@ -269,6 +269,13 @@ void create_window(int width, int height)
 	glEnable(GL_TEXTURE_2D);
 }
 
+void video_should_close(int v)
+{
+	if (!window)
+		return;
+	glfwSetWindowShouldClose(window, v);
+}
+
 static void init_framebuffer(int width, int height)
 {
 	glGenFramebuffers(1, &video.fbo_id);

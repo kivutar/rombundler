@@ -106,6 +106,10 @@ static bool core_environment(unsigned cmd, void *data)
 			*(bool*)data = false;
 		}
 		break;
+		case RETRO_ENVIRONMENT_SHUTDOWN: {
+			video_should_close(1);
+		}
+		break;
 		case RETRO_ENVIRONMENT_GET_AUDIO_VIDEO_ENABLE: {
 			*(int*)data = 1 << 0 | 1 << 1;
 		}

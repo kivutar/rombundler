@@ -216,6 +216,9 @@ void input_poll(void) {
 	{
 		for (i = 0; kbd2joy_binds[i].k || kbd2joy_binds[i].rk; ++i)
 			state[0][kbd2joy_binds[i].rk] = glfwGetKey(window, kbd2joy_binds[i].k) == GLFW_PRESS;
+
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
 	}
 
 	int port;
@@ -243,9 +246,6 @@ void input_poll(void) {
 			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
 			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
 		}
-
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
 }
 
 void input_set_keyboard_callback(retro_keyboard_event_t e)
