@@ -111,9 +111,15 @@ static bool core_environment(unsigned cmd, void *data)
 		}
 		break;
 		case RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK: {
-			const struct retro_frame_time_callback *frame_time =
+			const struct retro_frame_time_callback *cb =
 				(const struct retro_frame_time_callback*)data;
-			runloop_frame_time = *frame_time;
+			runloop_frame_time = *cb;
+		}
+		break;
+		case RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK: {
+			const struct retro_keyboard_callback *cb =
+				(const struct retro_keyboard_callback*)data;
+			input_set_keyboard_callback(cb->callback);
 		}
 		break;
 		case RETRO_ENVIRONMENT_GET_PERF_INTERFACE: {
