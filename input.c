@@ -221,7 +221,7 @@ void input_poll(void) {
 			glfwSetWindowShouldClose(window, true);
 	}
 
-	int port;
+	/*int port;
 	for (port = 0; port < MAX_PLAYERS; port++)
 		if (glfwJoystickIsGamepad(port))
 		{
@@ -245,7 +245,7 @@ void input_poll(void) {
 
 			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
 			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
-		}
+		}*/
 }
 
 void input_set_keyboard_callback(retro_keyboard_event_t e)

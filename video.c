@@ -210,15 +210,15 @@ static void init_shaders()
 
 void create_window(int width, int height)
 {
-	if (video.hw.context_type == RETRO_HW_CONTEXT_OPENGL_CORE || video.hw.version_major >= 3) {
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, video.hw.version_major);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, video.hw.version_minor);
-	}
-	else
-	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	}
+	// if (video.hw.context_type == RETRO_HW_CONTEXT_OPENGL_CORE || video.hw.version_major >= 3) {
+	// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, video.hw.version_major);
+	// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, video.hw.version_minor);
+	// }
+	// else
+	// {
+	// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	// }
 
 	switch (video.hw.context_type) {
 		case RETRO_HW_CONTEXT_OPENGL_CORE:

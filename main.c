@@ -6,7 +6,14 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#define GL_GLEXT_PROTOTYPES
+#define EGL_EGLEXT_PROTOTYPES
+#else
 #include <glad/glad.h>
+#endif
 
 #include "config.h"
 #include "options.h"
@@ -20,10 +27,23 @@
 
 extern GLFWwindow *window;
 config g_cfg;
+static unsigned frame = 0;
 
 static void error_cb(int error, const char* description)
 {
 	fprintf(stderr, "Error: %s\n", description);
+}
+
+static void update()
+{
+	glfwPollEvents();
+	input_poll();
+	core_run();
+	video_render();
+	glfwSwapBuffers(window);
+	frame++;
+	if (frame % 600 == 0)
+		srm_save();
 }
 
 int main(int argc, char *argv[]) {
@@ -45,17 +65,12 @@ int main(int argc, char *argv[]) {
 
 	glfwSwapInterval(g_cfg.swap_interval);
 
-	unsigned frame = 0;
-	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
-		input_poll();
-		core_run();
-		video_render();
-		glfwSwapBuffers(window);
-		frame++;
-		if (frame % 600 == 0)
-			srm_save();
-	}
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(update, 0, true);
+#else
+	while (!glfwWindowShouldClose(window))
+		update();
+#endif
 
 	srm_save();
 	core_unload();

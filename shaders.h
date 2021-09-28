@@ -16,6 +16,7 @@ static const char *fshader_default_src =
 	"}";
 
 static const char *fshader_zfastcrt_src =
+	"precision mediump float;\n"
 	"uniform vec2 u_tex_size;\n"
 	"uniform sampler2D u_tex;\n"
 	"varying vec2 o_coord;\n"

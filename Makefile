@@ -1,24 +1,14 @@
 TARGET := rombundler
 VERSION ?= devel
 
-ifeq ($(shell uname -s),) # win
-	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
-	OS ?= Windows
-else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
-	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
-	OS ?= Windows
-else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
-	LDFLAGS := -Ldeps/osx/lib -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
-	LDFLAGS += -framework OpenAL
-	OS ?= OSX
-else
-	LDFLAGS := -ldl
-	LDFLAGS += $(shell pkg-config --libs glfw3)
-	LDFLAGS += $(shell pkg-config --libs openal)
-	OS ?= Linux
-endif
+TARGET := index.html
+LDFLAGS := -ldl -lopenal -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s MAIN_MODULE=1 \
+	-s EXIT_RUNTIME=1 \
+	-s ALLOW_MEMORY_GROWTH=1 \
+	--no-heap-copy \
+	--preload-file config.ini \
+	--preload-file nes_libretro.wasm.so \
+	--preload-file mm.nes
 
 CFLAGS += -Wall -O3 -fPIC -flto -I. -Iinclude -Ideps/include
 
