@@ -238,10 +238,12 @@ void create_window(int width, int height)
 	GLFWmonitor* monitor = NULL;
 	if (g_cfg.fullscreen)
 	{
+		int count;
 		monitor = glfwGetPrimaryMonitor();
-		const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-		width = mode->width;
-		height = mode->height;
+		const GLFWvidmode *modes = glfwGetVideoModes(monitor, &count);
+		const GLFWvidmode mode = modes[count-1];
+		width = mode.width;
+		height = mode.height;
 	}
 
 	window = glfwCreateWindow(width, height, g_cfg.title, monitor, NULL);
