@@ -18,6 +18,7 @@
 #include "audio.h"
 #include "input.h"
 #include "options.h"
+#include "config.h"
 
 #if defined(_WIN32)
 #define load_lib(L) LoadLibrary(L);
@@ -53,6 +54,7 @@ static struct {
 
 static struct retro_frame_time_callback runloop_frame_time;
 static retro_usec_t runloop_frame_time_last = 0;
+extern config g_cfg;
 
 static void core_log(enum retro_log_level level, const char *fmt, ...)
 {
@@ -258,10 +260,10 @@ void core_load_game(const char *filename)
 	video_configure(&av.geometry);
 	audio_init(av.timing.sample_rate);
 
-	core.retro_set_controller_port_device(0, RETRO_DEVICE_JOYPAD);
-	core.retro_set_controller_port_device(1, RETRO_DEVICE_JOYPAD);
-	core.retro_set_controller_port_device(2, RETRO_DEVICE_JOYPAD);
-	core.retro_set_controller_port_device(3, RETRO_DEVICE_JOYPAD);
+	if (g_cfg.port0) core.retro_set_controller_port_device(0, g_cfg.port0);
+	if (g_cfg.port1) core.retro_set_controller_port_device(1, g_cfg.port1);
+	if (g_cfg.port2) core.retro_set_controller_port_device(2, g_cfg.port2);
+	if (g_cfg.port3) core.retro_set_controller_port_device(3, g_cfg.port3);
 
 	return;
 }

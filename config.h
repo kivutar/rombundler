@@ -14,6 +14,10 @@ typedef struct
     float aspect_ratio;
     bool hide_cursor;
     bool map_analog_to_dpad;
+    unsigned port0;
+    unsigned port1;
+    unsigned port2;
+    unsigned port3;
 } config;
 
 void cfg_defaults(config* c);

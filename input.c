@@ -280,5 +280,10 @@ int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id)
 			return 1;
 	}
 
+	if (device == RETRO_DEVICE_KEYBOARD)
+		for (int i = 0; kbd_binds[i].k || kbd_binds[i].rk; ++i)
+			if (id == kbd_binds[i].rk && window && glfwGetKey(window, kbd_binds[i].k) == GLFW_PRESS)
+				return 1;
+
 	return 0;
 }

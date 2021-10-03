@@ -49,6 +49,25 @@ ROMBundler will read the ini file, load the emulator and the ROM and the game wi
 
 You can then rename `rombundler` with the name of your game, change it's icon, and distribute this as a zip.
 
+## Inputs configuration
+
+You can choose what kind of device is plugged in the console ports in the config.ini:
+
+    port0 = 3
+    port1 = 1
+
+The identifiers can be found in the libretro.h:
+
+```
+#define RETRO_DEVICE_NONE         0
+#define RETRO_DEVICE_JOYPAD       1
+#define RETRO_DEVICE_MOUSE        2
+#define RETRO_DEVICE_KEYBOARD     3
+#define RETRO_DEVICE_LIGHTGUN     4
+#define RETRO_DEVICE_ANALOG       5
+#define RETRO_DEVICE_POINTER      6
+```
+
 ## Emulator configuration
 
 If you need special options for the emulator, you can set them by creating a options.ini file like this:
