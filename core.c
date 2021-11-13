@@ -170,6 +170,7 @@ static bool core_environment(unsigned cmd, void *data)
 		break;
 		case RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY:
 		case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY:
+		case RETRO_ENVIRONMENT_GET_CORE_ASSETS_DIRECTORY:
 			*(const char **)data = ".";
 		break;
 
