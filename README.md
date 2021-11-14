@@ -108,6 +108,7 @@ We recommand using the linear filter with the CRT and LCD shaders.
  * lutro_libretro
  * fceumm_libretro
  * blastem_libretro
+ * bluemsx_libretro
  * snes9x_libretro
  * genesis_plus_gx_libretro
  * nes_libretro
