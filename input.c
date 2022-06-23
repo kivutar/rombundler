@@ -260,7 +260,7 @@ int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id)
 	if (port < MAX_PLAYERS && device == RETRO_DEVICE_JOYPAD)
 		return state[port][id];
 
-	if (device == RETRO_DEVICE_MOUSE) {
+	if (device == RETRO_DEVICE_MOUSE && window != NULL) {
 		double x = 0;
 		double y = 0;
 		glfwGetCursorPos(window, &x, &y);
