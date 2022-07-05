@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <stdio.h>
 
 #include "input.h"
 #include "config.h"
@@ -201,9 +202,14 @@ struct keymap joy_binds[] = {
 };
 
 #define MAX_PLAYERS 5
-static unsigned state[MAX_PLAYERS][RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
+static int16_t state[MAX_PLAYERS][RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
+static int16_t analog_state[MAX_PLAYERS][2][2] = { 0 };
 static retro_keyboard_event_t key_event = NULL;
 extern GLFWwindow *window;
+
+int16_t floatToAnalog(float v) {
+	return v * 32767.0;
+}
 
 void input_poll(void) {
 	int i;
@@ -247,6 +253,11 @@ void input_poll(void) {
 				}
 			}
 
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_RIGHT_X]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
+
 			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
 			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
 		}
@@ -261,8 +272,14 @@ static double oldx = 0;
 static double oldy = 0;
 
 int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id) {
-	if (port < MAX_PLAYERS && device == RETRO_DEVICE_JOYPAD)
+	if (port >= MAX_PLAYERS)
+		return 0;
+
+	if (device == RETRO_DEVICE_JOYPAD)
 		return state[port][id];
+
+	if (device == RETRO_DEVICE_ANALOG)
+		return analog_state[port][index][id];
 
 	if (device == RETRO_DEVICE_MOUSE && window != NULL) {
 		double x = 0;
