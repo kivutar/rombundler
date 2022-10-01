@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include "mappings.h"
 #include "config.h"
 #include "options.h"
 #include "core.h"
@@ -37,6 +38,8 @@ int main(int argc, char *argv[]) {
 
 	if (!glfwInit())
 		die("Failed to initialize GLFW");
+
+	glfwUpdateGamepadMappings(mappings);
 
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
