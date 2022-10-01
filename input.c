@@ -28,8 +28,6 @@ struct keymap kbd2joy_binds[] = {
 	{ GLFW_KEY_W, RETRO_DEVICE_ID_JOYPAD_R },
 	{ GLFW_KEY_1, RETRO_DEVICE_ID_JOYPAD_L2 },
 	{ GLFW_KEY_2, RETRO_DEVICE_ID_JOYPAD_R2 },
-
-	{ 0, 0 }
 };
 
 struct keymap kbd_binds[] = {
@@ -106,7 +104,7 @@ struct keymap kbd_binds[] = {
 	{ GLFW_KEY_LEFT_BRACKET, RETROK_LEFTBRACE },
 	// { GLFW_KEY_BAR, RETROK_BAR },
 	{ GLFW_KEY_RIGHT_BRACKET, RETROK_RIGHTBRACE },
-    // { GLFW_KEY_TILDE, RETROK_TILDE },
+	// { GLFW_KEY_TILDE, RETROK_TILDE },
 	{ GLFW_KEY_DELETE, RETROK_DELETE },
 
 	{ GLFW_KEY_KP_0, RETROK_KP0 },
@@ -197,8 +195,6 @@ struct keymap joy_binds[] = {
 	{ GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, RETRO_DEVICE_ID_JOYPAD_R },
 	{ GLFW_GAMEPAD_BUTTON_LEFT_THUMB, RETRO_DEVICE_ID_JOYPAD_L3 },
 	{ GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, RETRO_DEVICE_ID_JOYPAD_R3 },
-
-	{ 0, 0 }
 };
 
 #define MAX_PLAYERS 5
@@ -224,7 +220,7 @@ void input_poll(void) {
 	}
 	else
 	{
-		for (i = 0; kbd2joy_binds[i].k || kbd2joy_binds[i].rk; ++i)
+		for (i = 0; i < 14; i++)
 			state[0][kbd2joy_binds[i].rk] = glfwGetKey(window, kbd2joy_binds[i].k) == GLFW_PRESS;
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -233,34 +229,33 @@ void input_poll(void) {
 
 	int port;
 	for (port = 0; port < MAX_PLAYERS; port++)
-		if (glfwJoystickIsGamepad(port))
-		{
-			GLFWgamepadstate pad;
-			if (glfwGetGamepadState(port, &pad))
-				for (i = 0; i <= 14; i++)
-					state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
+	{
+		if (!glfwJoystickIsGamepad(port))
+			continue;
 
-			int count;
-			const float *axes = glfwGetJoystickAxes(port, &count);
+		GLFWgamepadstate pad;
+		if (glfwGetGamepadState(port, &pad))
+		{
+			for (i = 0; i <= 14; i++)
+				state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
+
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(pad.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]);
+			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(pad.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
+
+			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
+			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = pad.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
+
 			if (g_cfg.map_analog_to_dpad)
 			{
-				if (count >= 2)
-				{
-					state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] = axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
-					state[port][RETRO_DEVICE_ID_JOYPAD_RIGHT] = axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5;
-					state[port][RETRO_DEVICE_ID_JOYPAD_UP] = axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5;
-					state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] = axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
-				}
+				state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_RIGHT] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_UP] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
 			}
-
-			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
-			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
-			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_RIGHT_X]);
-			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_RIGHT][RETRO_DEVICE_ID_ANALOG_Y] = floatToAnalog(axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
-
-			state[port][RETRO_DEVICE_ID_JOYPAD_L2] = axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0.5;
-			state[port][RETRO_DEVICE_ID_JOYPAD_R2] = axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.5;
 		}
+	}
 }
 
 void input_set_keyboard_callback(retro_keyboard_event_t e)
