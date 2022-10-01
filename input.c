@@ -28,8 +28,6 @@ struct keymap kbd2joy_binds[] = {
 	{ GLFW_KEY_W, RETRO_DEVICE_ID_JOYPAD_R },
 	{ GLFW_KEY_1, RETRO_DEVICE_ID_JOYPAD_L2 },
 	{ GLFW_KEY_2, RETRO_DEVICE_ID_JOYPAD_R2 },
-
-	{ 0, 0 }
 };
 
 struct keymap kbd_binds[] = {
@@ -197,8 +195,6 @@ struct keymap joy_binds[] = {
 	{ GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, RETRO_DEVICE_ID_JOYPAD_R },
 	{ GLFW_GAMEPAD_BUTTON_LEFT_THUMB, RETRO_DEVICE_ID_JOYPAD_L3 },
 	{ GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, RETRO_DEVICE_ID_JOYPAD_R3 },
-
-	{ 0, 0 }
 };
 
 #define MAX_PLAYERS 5
@@ -224,7 +220,7 @@ void input_poll(void) {
 	}
 	else
 	{
-		for (i = 0; kbd2joy_binds[i].k || kbd2joy_binds[i].rk; ++i)
+		for (i = 0; i < 14; i++)
 			state[0][kbd2joy_binds[i].rk] = glfwGetKey(window, kbd2joy_binds[i].k) == GLFW_PRESS;
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

@@ -39,7 +39,8 @@ int main(int argc, char *argv[]) {
 	if (!glfwInit())
 		die("Failed to initialize GLFW");
 
-	glfwUpdateGamepadMappings(mappings);
+	if (!glfwUpdateGamepadMappings(mappings))
+		die("Failed to load mappings");
 
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
