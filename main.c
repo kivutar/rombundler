@@ -27,6 +27,14 @@ static void error_cb(int error, const char* description)
 	fprintf(stderr, "Error: %s\n", description);
 }
 
+void joystick_callback(int jid, int event)
+{
+	if (event == GLFW_CONNECTED)
+		printf("%s %s\n", glfwGetJoystickName(jid), glfwGetJoystickGUID(jid));
+	else if (event == GLFW_DISCONNECTED)
+		printf("Joypad %d disconnected\n", jid);
+}
+
 int main(int argc, char *argv[]) {
 	cfg_defaults(&g_cfg);
 	if (ini_parse("./config.ini", cfg_handler, &g_cfg) < 0)
@@ -41,6 +49,10 @@ int main(int argc, char *argv[]) {
 
 	if (!glfwUpdateGamepadMappings(mappings))
 		die("Failed to load mappings");
+	else
+		printf("Updated mappings\n");
+
+	glfwSetJoystickCallback(joystick_callback);
 
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
