@@ -30,7 +30,7 @@ static void error_cb(int error, const char* description)
 void joystick_callback(int jid, int event)
 {
 	if (event == GLFW_CONNECTED)
-		printf("%s %s\n", glfwGetJoystickName(jid), glfwGetJoystickGUID(jid));
+		printf("%s %s\n", glfwGetGamepadName(jid), glfwGetJoystickGUID(jid));
 	else if (event == GLFW_DISCONNECTED)
 		printf("Joypad %d disconnected\n", jid);
 }
