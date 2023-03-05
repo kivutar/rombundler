@@ -13,7 +13,7 @@ void cfg_defaults(config *c)
 	c->fullscreen = false;
 	c->window_width = 800;
 	c->window_height = 600;
-	c->aspect_ratio = 4.0 / 3.0;
+	c->aspect_ratio = 0;
 	c->swap_interval = 1;
 	c->hide_cursor = false;
 	c->map_analog_to_dpad = true;

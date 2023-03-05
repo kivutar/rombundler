@@ -1,6 +1,7 @@
 #include "libretro.h"
 
 void create_window(int width, int height);
+void video_set_rotation(unsigned rot);
 void video_configure(const struct retro_game_geometry *geom);
 bool video_set_pixel_format(unsigned format);
 void video_set_geometry(const struct retro_game_geometry *geom);

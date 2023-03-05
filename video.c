@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -45,6 +46,7 @@ static struct {
 	GLint tex_w, tex_h;
 	GLuint clip_w, clip_h;
 	float aspect_ratio;
+	unsigned rot;
 
 	GLuint pixfmt;
 	GLuint pixtype;
@@ -97,6 +99,41 @@ static void ortho2d(float m[4][4], float left, float right, float bottom, float 
 	m[3][1] = -(top + bottom) / (top - bottom);
 }
 
+static void rotate_uv(float va[16], unsigned rot) {
+	switch (rot) {
+	case 1: // 90 degrees
+		va[2] = 0;
+		va[3] = 0;
+		va[6] = 1;
+		va[7] = 0;
+		va[10] = 0;
+		va[11] = 1;
+		va[14] = 1;
+		va[15] = 1;
+		break;
+	case 2: // 180 degrees
+		va[2] = 1;
+		va[3] = 0;
+		va[6] = 1;
+		va[7] = 1;
+		va[10] = 0;
+		va[11] = 0;
+		va[14] = 0;
+		va[15] = 1;
+		break;
+	case 3: // 270 degrees
+		va[2] = 1;
+		va[3] = 1;
+		va[6] = 0;
+		va[7] = 1;
+		va[10] = 1;
+		va[11] = 0;
+		va[14] = 0;
+		va[15] = 0;
+		break;
+	}
+}
+
 static void core_ratio_viewport()
 {
 	int fbw = 0, fbh = 0;
@@ -105,7 +142,7 @@ static void core_ratio_viewport()
 	float ffbw = (float)fbw;
 	float ffbh = (float)fbh;
 
-	if (video.aspect_ratio <= 0)
+	if (video.aspect_ratio == 0)
 		video.aspect_ratio = ffbw / ffbh;
 
 	float h = ffbh;
@@ -136,6 +173,8 @@ static void core_ratio_viewport()
 		x4/ffbw*2 - 1, y4/ffbh*2 - 1, 1, 0, // right-top
 	};
 
+	rotate_uv(vertex_data, video.rot);
+
 	glBindVertexArray(shader.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, shader.vbo);
@@ -148,6 +187,17 @@ static void core_ratio_viewport()
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void rot2d(float m[4][4], float a)
+{
+	float c = cos(a);
+	float s = sin(a);
+
+	m[0][0] =  c;
+	m[0][1] =  s;
+	m[1][0] = -s;
+	m[1][1] =  c;
 }
 
 static void init_shaders()
@@ -206,6 +256,11 @@ static void init_shaders()
 	glUniformMatrix4fv(shader.u_mvp, 1, GL_FALSE, (float*)m);
 
 	glUseProgram(0);
+}
+
+void video_set_rotation(unsigned rot)
+{
+	video.rot = rot % 4;
 }
 
 void create_window(int width, int height)

@@ -83,6 +83,10 @@ static retro_time_t get_time_usec()
 static bool core_environment(unsigned cmd, void *data)
 {
 	switch (cmd) {
+		case RETRO_ENVIRONMENT_SET_ROTATION: {
+			video_set_rotation(*(uintptr_t*)(data));
+		}
+		break;
 		case RETRO_ENVIRONMENT_GET_LOG_INTERFACE: {
 			struct retro_log_callback *cb = (struct retro_log_callback *)data;
 			cb->log = core_log;
