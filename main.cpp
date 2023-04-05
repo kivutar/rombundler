@@ -22,10 +22,11 @@
 #include "nongamestate.h"
 #include "netplay.h"
 
+#define FRAME_DELAY 2
 GGPOSession *ggpo = NULL;
+extern NonGameState ngs;
 extern GLFWwindow *window;
 config g_cfg;
-
 
 static void error_cb(int error, const char* description)
 {
@@ -74,6 +75,39 @@ int main(int argc, char *argv[]) {
 	cb.free_buffer     = net_free_buffer;
 	cb.on_event        = net_on_event_callback;
 	cb.log_game_state  = net_log_game_state;
+
+	int localport = 1234;
+	int num_players = 2;
+	int num_spectators = 0;
+	GGPOErrorCode result = ggpo_start_session(&ggpo, &cb, "vectorwar", 4, sizeof(int), localport);
+
+	ggpo_set_disconnect_timeout(ggpo, 3000);
+	ggpo_set_disconnect_notify_start(ggpo, 1000);
+
+	GGPOPlayer players[2] = { { 0 } };
+	players[0].size = sizeof(GGPOPlayer);
+	players[0].player_num = 1;
+	players[0].type = GGPO_PLAYERTYPE_LOCAL;
+
+	players[1].size = sizeof(GGPOPlayer);
+	players[1].player_num = 2;
+	players[1].type = GGPO_PLAYERTYPE_REMOTE;
+
+	int i;
+	for (i = 0; i < num_players + num_spectators; i++) {
+		GGPOPlayerHandle handle;
+		result = ggpo_add_player(ggpo, players + i, &handle);
+		ngs.players[i].handle = handle;
+		ngs.players[i].type = players[i].type;
+		if (players[i].type == GGPO_PLAYERTYPE_LOCAL) {
+			ngs.players[i].connect_progress = 100;
+			ngs.local_player_handle = handle;
+			ngs.SetConnectState(handle, Connecting);
+			ggpo_set_frame_delay(ggpo, handle, FRAME_DELAY);
+		} else {
+			ngs.players[i].connect_progress = 0;
+		}
+	}
 
 	unsigned frame = 0;
 	while (!glfwWindowShouldClose(window)) {
