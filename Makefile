@@ -26,7 +26,19 @@ CFLAGS += -Wall -O3 -fPIC -flto
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += -lc++
 
-SOURCES_C = main.c glad.c config.c core.c audio.c video.c input.c options.c ini.c utils.c srm.c
+SOURCES_CXX = main.cpp \
+	glad.cpp \
+	config.cpp \
+	core.cpp \
+	audio.cpp \
+	video.cpp \
+	input.cpp \
+	options.cpp \
+	ini.cpp \
+	utils.cpp \
+	srm.cpp \
+	netplay.cpp
+
 SOURCES_CXX += ggpo/src/lib/ggpo/bitvector.cpp \
 	ggpo/src/lib/ggpo/game_input.cpp \
 	ggpo/src/lib/ggpo/input_queue.cpp \
