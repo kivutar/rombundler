@@ -7,7 +7,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+
 #include <ggponet.h>
+#include <platform_unix.h>
 
 #include "mappings.h"
 #include "config.h"
@@ -22,7 +24,6 @@
 #include "nongamestate.h"
 #include "netplay.h"
 
-#define FRAME_DELAY 2
 extern GGPOSession *ggpo;
 extern NonGameState ngs;
 extern GLFWwindow *window;
@@ -39,6 +40,11 @@ void joystick_callback(int jid, int event)
 		printf("%s %s\n", glfwGetGamepadName(jid), glfwGetJoystickGUID(jid));
 	else if (event == GLFW_DISCONNECTED)
 		printf("Joypad %d disconnected\n", jid);
+}
+
+int max(int a, int b)
+{
+	return a > b ? a : b;
 }
 
 int main(int argc, char *argv[]) {
@@ -76,7 +82,13 @@ int main(int argc, char *argv[]) {
 	cb.on_event        = net_on_event_callback;
 	cb.log_game_state  = net_log_game_state;
 
-	int localport = 1234;
+
+	int localport = argc > 1 ? atoi(argv[1]) : 1234;
+	printf("localport: %d\n", localport);
+
+	int remoteport = argc > 2 ? atoi(argv[2]) : 1235;
+	printf("remoteport: %d\n", remoteport);
+
 	int num_players = 2;
 	int num_spectators = 0;
 	ngs.num_players = num_players;
@@ -89,15 +101,15 @@ int main(int argc, char *argv[]) {
 	ggpo_set_disconnect_notify_start(ggpo, 1000);
 
 	GGPOPlayer players[2] = { { 0 } };
-	players[1].size = sizeof(GGPOPlayer);
-	players[1].player_num = 1;
-	players[1].type = GGPO_PLAYERTYPE_LOCAL;
+	players[0].size = sizeof(GGPOPlayer);
+	players[0].player_num = 1;
+	players[0].type = GGPO_PLAYERTYPE_LOCAL;
 
-	players[1].size = sizeof(GGPOPlayer);
-	players[1].player_num = 2;
-	players[1].type = GGPO_PLAYERTYPE_REMOTE;
-	players[1].u.remote.port = 1235;
-	strncpy(players[1].u.remote.ip_address, "127.0.0.1", strlen("127.0.0.1"));
+	players[0].size = sizeof(GGPOPlayer);
+	players[0].player_num = 2;
+	players[0].type = GGPO_PLAYERTYPE_REMOTE;
+	players[0].u.remote.port = remoteport;
+	strcpy(players[0].u.remote.ip_address, "127.0.0.1");
 
 	int i;
 	for (i = 0; i < num_players + num_spectators; i++) {
@@ -109,27 +121,33 @@ int main(int argc, char *argv[]) {
 			ngs.players[i].connect_progress = 100;
 			ngs.local_player_handle = handle;
 			ngs.SetConnectState(handle, Connecting);
-			ggpo_set_frame_delay(ggpo, handle, FRAME_DELAY);
+			ggpo_set_frame_delay(ggpo, handle, 2);
 		} else {
 			ngs.players[i].connect_progress = 0;
 		}
 	}
 
 	glfwSwapInterval(g_cfg.swap_interval);
-	unsigned frame = 0;
+
+	uint32_t start = Platform::GetCurrentTimeMS();
+	uint32_t next = start;
+	uint32_t now = start;
+	
 	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
-		input_poll();
+		now = Platform::GetCurrentTimeMS();
+		net_idle(max(0, next - now - 1));
+		if (now >= next) {
+			glfwPollEvents();
+			input_poll();
 
-		net_run_frame();
+			net_run_frame();
 
-		// core_run();
-		// video_render();
+			// core_run();
+			// video_render();
 
-		glfwSwapBuffers(window);
-		frame++;
-		// if (frame % 600 == 0)
-		// 	srm_save();
+			glfwSwapBuffers(window);
+			next = now + (1000 / 60);
+		}
 	}
 
 	// srm_save();

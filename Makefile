@@ -52,8 +52,7 @@ SOURCES_CXX += ggpo/src/lib/ggpo/bitvector.cpp \
 	ggpo/src/lib/ggpo/network/udp.cpp \
 	ggpo/src/lib/ggpo/network/udp_proto.cpp \
 	ggpo/src/lib/ggpo/backends/p2p.cpp \
-	ggpo/src/lib/ggpo/backends/spectator.cpp \
-	ggpo/src/lib/ggpo/backends/synctest.cpp
+	ggpo/src/lib/ggpo/backends/spectator.cpp
 
 OBJECTS := $(SOURCES_CXX:.cpp=.o)
 OBJECTS += $(SOURCES_C:.c=.o)

@@ -38,6 +38,8 @@ fletcher32_checksum(short *data, size_t len)
 bool __cdecl
 net_begin_game_callback(const char *name)
 {
+   printf("net_begin_game_callback\n");
+
    core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
 	// srm_load();
@@ -47,6 +49,8 @@ net_begin_game_callback(const char *name)
 
 void net_advance_frame(int inputs[], int disconnect_flags)
 {
+   printf("net_advance_frame");
+
    // gs.Update(inputs, disconnect_flags);
 
    // update the checksums to display in the top of the window.  this
@@ -74,6 +78,12 @@ void net_advance_frame(int inputs[], int disconnect_flags)
 }
 
 void
+net_idle(int time)
+{
+   ggpo_idle(ggpo, time);
+}
+
+void
 net_run_frame()
 {
   GGPOErrorCode result = GGPO_OK;
@@ -86,6 +96,7 @@ net_run_frame()
      input = rand(); // test: use random inputs to demonstrate sync testing
 #endif
      result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &input, sizeof(input));
+     printf("input: %d\n", result);
   }
 
    // synchronize these inputs with ggpo.  If we have enough input to proceed
@@ -105,6 +116,7 @@ net_run_frame()
 bool __cdecl
 net_advance_frame_callback(int flags)
 {
+   printf("net_advance_frame_callback\n");
    int inputs[MAX_CHARS] = { 0 };
    int disconnect_flags;
 
@@ -122,6 +134,7 @@ net_advance_frame_callback(int flags)
 bool __cdecl
 net_load_game_state_callback(unsigned char *buffer, int len)
 {
+   printf("net_load_game_state_callback\n");
    // TODO call retro_unserialize
    // memcpy(&gs, buffer, len);
 
@@ -133,6 +146,7 @@ net_load_game_state_callback(unsigned char *buffer, int len)
 bool __cdecl
 net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, int frame)
 {
+   printf("net_save_game_state_callback\n");
    // *len = sizeof(gs);
    // *buffer = (unsigned char *)malloc(*len);
    // if (!*buffer) {
@@ -156,6 +170,7 @@ net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, in
 void __cdecl 
 net_free_buffer(void *buffer)
 {
+   printf("net_free_buffer\n");
    free(buffer);
 }
 
@@ -163,6 +178,7 @@ bool __cdecl
 net_on_event_callback(GGPOEvent *info)
 {
    int progress;
+   printf("net_on_event_callback %d\n", info->code);
    switch (info->code) {
    case GGPO_EVENTCODE_CONNECTED_TO_PEER:
       ngs.SetConnectState(info->u.connected.player, Synchronizing);

@@ -306,19 +306,16 @@ void *core_get_memory_data(unsigned id)
 
 size_t core_serialize_size()
 {
-	printf("core_serialize_size\n");
 	return core.retro_serialize_size();
 }
 
 bool core_serialize(void *data, size_t size)
 {
-	printf("core_serialize\n");
 	return core.retro_serialize(data, size);
 }
 
 bool core_unserialize(const void *data, size_t size)
 {
-	printf("core_unserialize\n");
 	return core.retro_unserialize(data, size);
 }
 
