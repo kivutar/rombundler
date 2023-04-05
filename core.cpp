@@ -50,6 +50,9 @@ static struct {
 	void (*retro_unload_game)(void);
 	void* (*retro_get_memory_data)(unsigned);
 	size_t (*retro_get_memory_size)(unsigned);
+	size_t (*retro_serialize_size)(void);
+	bool (*retro_serialize)(void *data, size_t size);
+	bool (*retro_unserialize)(const void *data, size_t size);
 } core;
 
 static struct retro_frame_time_callback runloop_frame_time;
@@ -215,6 +218,9 @@ void core_load(const char *sofile)
 	load_retro_sym(retro_unload_game);
 	load_retro_sym(retro_get_memory_data);
 	load_retro_sym(retro_get_memory_size);
+	load_retro_sym(retro_serialize_size);
+	load_retro_sym(retro_serialize);
+	load_retro_sym(retro_unserialize);
 
 	load_sym(set_environment, retro_set_environment);
 	load_sym(set_video_refresh, retro_set_video_refresh);
@@ -236,7 +242,7 @@ void core_load(const char *sofile)
 
 void core_load_game(const char *filename)
 {
-	struct retro_system_av_info av = {0};
+	struct retro_system_av_info av = {{0}};
 	struct retro_system_info si = {0};
 	struct retro_game_info info = { filename, 0 };
 	FILE *file = fopen(filename, "rb");
@@ -296,6 +302,24 @@ size_t core_get_memory_size(unsigned id)
 void *core_get_memory_data(unsigned id)
 {
 	return core.retro_get_memory_data(id);
+}
+
+size_t core_serialize_size()
+{
+	printf("core_serialize_size\n");
+	return core.retro_serialize_size();
+}
+
+bool core_serialize(void *data, size_t size)
+{
+	printf("core_serialize\n");
+	return core.retro_serialize(data, size);
+}
+
+bool core_unserialize(const void *data, size_t size)
+{
+	printf("core_unserialize\n");
+	return core.retro_unserialize(data, size);
 }
 
 void core_unload()

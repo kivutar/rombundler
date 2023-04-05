@@ -198,13 +198,20 @@ struct keymap joy_binds[] = {
 };
 
 #define MAX_PLAYERS 5
-static int16_t state[MAX_PLAYERS][RETRO_DEVICE_ID_JOYPAD_R3+1] = { 0 };
-static int16_t analog_state[MAX_PLAYERS][2][2] = { 0 };
+static int16_t state[MAX_PLAYERS][14] = {{0}};
+static int16_t analog_state[MAX_PLAYERS][2][2] = {{0}};
 static retro_keyboard_event_t key_event = NULL;
 extern GLFWwindow *window;
 
 int16_t floatToAnalog(float v) {
 	return v * 32767.0;
+}
+
+int input_get_state(unsigned port) {
+	int st = 0;
+	for (int i = 0; i < 14; i++)
+		st |= state[port][i];
+	return st;
 }
 
 void input_poll(void) {

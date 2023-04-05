@@ -3,8 +3,15 @@
 #include <ggponet.h>
 #include <platform_unix.h>
 #include "nongamestate.h"
+#include "core.h"
+#include "config.h"
+#include "input.h"
+#include "video.h"
 
+GGPOSession *ggpo = NULL;
 NonGameState ngs = { 0 };
+#define MAX_CHARS 4
+extern config g_cfg;
 
 int
 fletcher32_checksum(short *data, size_t len)
@@ -31,19 +38,84 @@ fletcher32_checksum(short *data, size_t len)
 bool __cdecl
 net_begin_game_callback(const char *name)
 {
+   core_load(g_cfg.core);
+	core_load_game(g_cfg.rom);
+	// srm_load();
+
    return true;
+}
+
+void net_advance_frame(int inputs[], int disconnect_flags)
+{
+   // gs.Update(inputs, disconnect_flags);
+
+   // update the checksums to display in the top of the window.  this
+   // helps to detect desyncs.
+   // ngs.now.framenumber = gs._framenumber;
+   // ngs.now.checksum = fletcher32_checksum((short *)&gs, sizeof(gs) / 2);
+   // if ((gs._framenumber % 90) == 0) {
+   //    ngs.periodic = ngs.now;
+   // }
+
+   core_run();
+
+   // Notify ggpo that we've moved forward exactly 1 frame.
+   ggpo_advance_frame(ggpo);
+
+   // Update the performance monitor display.
+   // GGPOPlayerHandle handles[MAX_PLAYERS];
+   // int count = 0;
+   // for (int i = 0; i < ngs.num_players; i++) {
+   //    if (ngs.players[i].type == GGPO_PLAYERTYPE_REMOTE) {
+   //       handles[count++] = ngs.players[i].handle;
+   //    }
+   // }
+   // ggpoutil_perfmon_update(ggpo, handles, count);
+}
+
+void
+net_run_frame()
+{
+  GGPOErrorCode result = GGPO_OK;
+  int disconnect_flags;
+  int inputs[MAX_CHARS] = { 0 };
+
+  if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
+     int input = input_get_state(0);
+#if defined(SYNC_TEST)
+     input = rand(); // test: use random inputs to demonstrate sync testing
+#endif
+     result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &input, sizeof(input));
+  }
+
+   // synchronize these inputs with ggpo.  If we have enough input to proceed
+   // ggpo will modify the input list with the correct inputs to use and
+   // return 1.
+  if (GGPO_SUCCEEDED(result)) {
+     result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_CHARS, &disconnect_flags);
+     if (GGPO_SUCCEEDED(result)) {
+         // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
+         // the game by 1 frame using those inputs.
+         net_advance_frame(inputs, disconnect_flags);
+     }
+  }
+  video_render();
 }
 
 bool __cdecl
 net_advance_frame_callback(int flags)
 {
-   // int inputs[MAX_SHIPS] = { 0 };
-   // int disconnect_flags;
+   int inputs[MAX_CHARS] = { 0 };
+   int disconnect_flags;
 
    // // Make sure we fetch new inputs from GGPO and use those to update
    // // the game state instead of reading from the keyboard.
    // ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_SHIPS, &disconnect_flags);
    // VectorWar_AdvanceFrame(inputs, disconnect_flags);
+
+   ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_CHARS, &disconnect_flags);
+   net_advance_frame(inputs, disconnect_flags);
+
    return true;
 }
 
@@ -52,6 +124,9 @@ net_load_game_state_callback(unsigned char *buffer, int len)
 {
    // TODO call retro_unserialize
    // memcpy(&gs, buffer, len);
+
+   core_unserialize(buffer, len);
+
    return true;
 }
 
@@ -66,6 +141,15 @@ net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, in
    // // todo change this line
    // memcpy(*buffer, &gs, *len);
    // *checksum = fletcher32_checksum((short *)*buffer, *len / 2);
+
+   *len = core_serialize_size();
+   *buffer = (unsigned char *)malloc(*len);
+   if (!*buffer) {
+      return false;
+   }
+   core_serialize(*buffer, *len);
+   *checksum = fletcher32_checksum((short *)*buffer, *len / 2);
+
    return true;
 }
 

@@ -23,7 +23,7 @@
 #include "netplay.h"
 
 #define FRAME_DELAY 2
-GGPOSession *ggpo = NULL;
+extern GGPOSession *ggpo;
 extern NonGameState ngs;
 extern GLFWwindow *window;
 config g_cfg;
@@ -60,11 +60,9 @@ int main(int argc, char *argv[]) {
 
 	glfwSetJoystickCallback(joystick_callback);
 
-	core_load(g_cfg.core);
-	core_load_game(g_cfg.rom);
-	// srm_load();
-
-	glfwSwapInterval(g_cfg.swap_interval);
+	// core_load(g_cfg.core);
+	// core_load_game(g_cfg.rom);
+	// // srm_load();
 
 	GGPOErrorCode result;
 	
@@ -84,15 +82,16 @@ int main(int argc, char *argv[]) {
 	ngs.num_players = num_players;
 
 	result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(int), localport);
-	printf("ggpo_start_session: %d\n", result);
+	if (result != GGPO_OK)
+		die("ggpo_start_session failed: %d\n", result);
 
 	ggpo_set_disconnect_timeout(ggpo, 3000);
 	ggpo_set_disconnect_notify_start(ggpo, 1000);
 
 	GGPOPlayer players[2] = { { 0 } };
-	players[0].size = sizeof(GGPOPlayer);
-	players[0].player_num = 1;
-	players[0].type = GGPO_PLAYERTYPE_LOCAL;
+	players[1].size = sizeof(GGPOPlayer);
+	players[1].player_num = 1;
+	players[1].type = GGPO_PLAYERTYPE_LOCAL;
 
 	players[1].size = sizeof(GGPOPlayer);
 	players[1].player_num = 2;
@@ -116,12 +115,17 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	glfwSwapInterval(g_cfg.swap_interval);
 	unsigned frame = 0;
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		input_poll();
-		core_run();
-		video_render();
+
+		net_run_frame();
+
+		// core_run();
+		// video_render();
+
 		glfwSwapBuffers(window);
 		frame++;
 		// if (frame % 600 == 0)
