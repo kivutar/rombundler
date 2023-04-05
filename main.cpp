@@ -62,9 +62,11 @@ int main(int argc, char *argv[]) {
 
 	core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
-	srm_load();
+	// srm_load();
 
 	glfwSwapInterval(g_cfg.swap_interval);
+
+	GGPOErrorCode result;
 	
 	// Fill in a ggpo callbacks structure to pass to start_session.
 	GGPOSessionCallbacks cb = { 0 };
@@ -79,7 +81,10 @@ int main(int argc, char *argv[]) {
 	int localport = 1234;
 	int num_players = 2;
 	int num_spectators = 0;
-	GGPOErrorCode result = ggpo_start_session(&ggpo, &cb, "vectorwar", 4, sizeof(int), localport);
+	ngs.num_players = num_players;
+
+	result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(int), localport);
+	printf("ggpo_start_session: %d\n", result);
 
 	ggpo_set_disconnect_timeout(ggpo, 3000);
 	ggpo_set_disconnect_notify_start(ggpo, 1000);
@@ -92,6 +97,8 @@ int main(int argc, char *argv[]) {
 	players[1].size = sizeof(GGPOPlayer);
 	players[1].player_num = 2;
 	players[1].type = GGPO_PLAYERTYPE_REMOTE;
+	players[1].u.remote.port = 1235;
+	strncpy(players[1].u.remote.ip_address, "127.0.0.1", strlen("127.0.0.1"));
 
 	int i;
 	for (i = 0; i < num_players + num_spectators; i++) {
@@ -117,11 +124,11 @@ int main(int argc, char *argv[]) {
 		video_render();
 		glfwSwapBuffers(window);
 		frame++;
-		if (frame % 600 == 0)
-			srm_save();
+		// if (frame % 600 == 0)
+		// 	srm_save();
 	}
 
-	srm_save();
+	// srm_save();
 	core_unload();
 	audio_deinit();
 	video_deinit();
