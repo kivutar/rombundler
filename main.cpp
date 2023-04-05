@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
 	cb.on_event        = net_on_event_callback;
 	cb.log_game_state  = net_log_game_state;
 
-
 	int localport = argc > 1 ? atoi(argv[1]) : 1234;
 	printf("localport: %d\n", localport);
 
@@ -93,7 +92,7 @@ int main(int argc, char *argv[]) {
 	int num_spectators = 0;
 	ngs.num_players = num_players;
 
-	result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(int), localport);
+	result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(uint16_t), localport);
 	if (result != GGPO_OK)
 		die("ggpo_start_session failed: %d\n", result);
 
@@ -138,8 +137,6 @@ int main(int argc, char *argv[]) {
 		net_idle(max(0, next - now - 1));
 		if (now >= next) {
 			glfwPollEvents();
-			input_poll();
-
 			net_run_frame();
 
 			// core_run();

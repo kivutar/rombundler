@@ -11,7 +11,7 @@
 
 GGPOSession *ggpo = NULL;
 NonGameState ngs = { 0 };
-#define MAX_CHARS 4
+#define MAX_CHARS 2
 extern config g_cfg;
 extern bool audio_fast_forward;
 
@@ -49,7 +49,7 @@ net_begin_game_callback(const char *name)
    return true;
 }
 
-void net_advance_frame(int inputs[], int disconnect_flags)
+void net_advance_frame(uint16_t inputs[], int disconnect_flags)
 {
    printf("net_advance_frame");
 
@@ -64,7 +64,7 @@ void net_advance_frame(int inputs[], int disconnect_flags)
    //    ngs.periodic = ngs.now;
    // }
 
-   audio_fast_forward = true;
+   audio_fast_forward = false;
 
    core_run();
 
@@ -93,9 +93,10 @@ net_run_frame()
 {
   GGPOErrorCode result = GGPO_OK;
   int disconnect_flags;
-  int inputs[MAX_CHARS] = { 0 };
+  uint16_t inputs[MAX_CHARS] = { 0 };
 
   if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
+     input_poll();
      int input = input_get_state(0);
 #if defined(SYNC_TEST)
      input = rand(); // test: use random inputs to demonstrate sync testing
@@ -108,7 +109,7 @@ net_run_frame()
    // ggpo will modify the input list with the correct inputs to use and
    // return 1.
   if (GGPO_SUCCEEDED(result)) {
-     result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_CHARS, &disconnect_flags);
+     result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
      if (GGPO_SUCCEEDED(result)) {
          // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
          // the game by 1 frame using those inputs.
@@ -122,7 +123,7 @@ bool __cdecl
 net_advance_frame_callback(int flags)
 {
    printf("net_advance_frame_callback\n");
-   int inputs[MAX_CHARS] = { 0 };
+   uint16_t inputs[MAX_CHARS] = { 0 };
    int disconnect_flags;
 
    // // Make sure we fetch new inputs from GGPO and use those to update
@@ -130,7 +131,7 @@ net_advance_frame_callback(int flags)
    // ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_SHIPS, &disconnect_flags);
    // VectorWar_AdvanceFrame(inputs, disconnect_flags);
 
-   ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_CHARS, &disconnect_flags);
+   ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
    net_advance_frame(inputs, disconnect_flags);
 
    return true;
@@ -163,11 +164,14 @@ net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, in
 
    *len = core_serialize_size();
    *buffer = (unsigned char *)malloc(*len);
-   if (!*buffer) {
+   if (!*buffer)
       return false;
-   }
-   core_serialize(*buffer, *len);
+
+   if (!core_serialize(*buffer, *len))
+      return false;
+
    *checksum = fletcher32_checksum((short *)*buffer, *len / 2);
+   printf("checksum: %d\n", *checksum);
 
    return true;
 }
