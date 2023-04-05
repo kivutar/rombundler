@@ -20,18 +20,43 @@ else
 	OS ?= Linux
 endif
 
-CFLAGS += -Wall -O3 -fPIC -flto -I. -Iinclude -Ideps/include
+INCFLAGS += -I. -Iinclude -Ideps/include
+INCFLAGS += -Iggpo/src/include -Iggpo/src/lib/ggpo -Iggpo/src/lib/ggpo/network -Iggpo/src/lib/ggpo/backends
+CFLAGS += -Wall -O3 -fPIC -flto 
+CXXFLAGS += -fno-rtti -fno-exceptions
+LDFLAGS += -lc++
 
-OBJ = main.o glad.o config.o core.o audio.o video.o input.o options.o ini.o utils.o srm.o
+SOURCES_C = main.c glad.c config.c core.c audio.c video.c input.c options.c ini.c utils.c srm.c
+SOURCES_CXX += ggpo/src/lib/ggpo/bitvector.cpp \
+	ggpo/src/lib/ggpo/game_input.cpp \
+	ggpo/src/lib/ggpo/input_queue.cpp \
+	ggpo/src/lib/ggpo/log.cpp \
+	ggpo/src/lib/ggpo/main.cpp \
+	ggpo/src/lib/ggpo/platform_unix.cpp \
+	ggpo/src/lib/ggpo/poll.cpp \
+	ggpo/src/lib/ggpo/sync.cpp \
+	ggpo/src/lib/ggpo/timesync.cpp \
+	ggpo/src/lib/ggpo/pevents.cpp \
+	ggpo/src/lib/ggpo/network/udp.cpp \
+	ggpo/src/lib/ggpo/network/udp_proto.cpp \
+	ggpo/src/lib/ggpo/backends/p2p.cpp \
+	ggpo/src/lib/ggpo/backends/spectator.cpp \
+	ggpo/src/lib/ggpo/backends/synctest.cpp
+
+OBJECTS := $(SOURCES_CXX:.cpp=.o)
+OBJECTS += $(SOURCES_C:.c=.o)
+
+%.o: %.cpp
+	$(CXX) -c -o $@ $< $(INCFLAGS) $(CFLAGS) $(CXXFLAGS)
 
 %.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $<  $(INCFLAGS) $(CFLAGS) -flto
 
 .PHONY: all clean
 
 all: $(TARGET)
-$(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS) -flto
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 bundle: $(TARGET)
 	mkdir -p ROMBundler-$(OS)-$(VERSION)
@@ -43,4 +68,4 @@ bundle: $(TARGET)
 	zip -r ROMBundler-$(OS)-$(VERSION).zip ROMBundler-$(OS)-$(VERSION)
 
 clean:
-	rm -rf $(OBJ) $(TARGET) ROMBundler-*
+	rm -rf $(OBJECTS) $(TARGET) ROMBundler-*
