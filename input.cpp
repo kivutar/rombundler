@@ -209,9 +209,18 @@ int16_t floatToAnalog(float v) {
 
 int input_get_state(unsigned port) {
 	int st = 0;
-	for (int i = 0; i < 14; i++)
+	int i = 0;
+	for (i = 0; i < 14; i++)
 		st |= state[port][i];
 	return st;
+}
+
+void input_set_state(int input[]) {
+	int p = 0;
+	int j = 0;
+	for (p = 0; p < 2; p++) // TODO unhardcode 2 here
+		for (j = 0; j < 14; j++)
+			state[p][j] = input[p] & (1 << j);
 }
 
 void input_poll(void) {

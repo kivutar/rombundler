@@ -7,11 +7,13 @@
 #include "config.h"
 #include "input.h"
 #include "video.h"
+#include "audio.h"
 
 GGPOSession *ggpo = NULL;
 NonGameState ngs = { 0 };
 #define MAX_CHARS 4
 extern config g_cfg;
+extern bool audio_fast_forward;
 
 int
 fletcher32_checksum(short *data, size_t len)
@@ -52,6 +54,7 @@ void net_advance_frame(int inputs[], int disconnect_flags)
    printf("net_advance_frame");
 
    // gs.Update(inputs, disconnect_flags);
+   input_set_state(inputs);
 
    // update the checksums to display in the top of the window.  this
    // helps to detect desyncs.
@@ -60,6 +63,8 @@ void net_advance_frame(int inputs[], int disconnect_flags)
    // if ((gs._framenumber % 90) == 0) {
    //    ngs.periodic = ngs.now;
    // }
+
+   audio_fast_forward = true;
 
    core_run();
 

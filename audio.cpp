@@ -23,6 +23,8 @@
 #include "audio.h"
 #include "utils.h"
 
+bool audio_fast_forward = false;
+
 typedef struct al
 {
 	ALuint source;
@@ -76,7 +78,7 @@ static size_t fill_internal_buf(const void *buf, size_t size)
 }
 
 size_t audio_write(const void *buf_, unsigned size) {
-	if (!al || !buf_ || !size)
+	if (!al || !buf_ || !size || audio_fast_forward)
 		return size;
 
 	const uint8_t *buf = (const uint8_t*)buf_;
