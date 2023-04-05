@@ -64,7 +64,7 @@ void net_advance_frame(uint16_t inputs[], int disconnect_flags)
    //    ngs.periodic = ngs.now;
    // }
 
-   audio_fast_forward = false;
+   audio_fast_forward = true;
 
    core_run();
 
@@ -97,7 +97,7 @@ net_run_frame()
 
   if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
      input_poll();
-     int input = input_get_state(0);
+     uint16_t input = input_get_state(0);
 #if defined(SYNC_TEST)
      input = rand(); // test: use random inputs to demonstrate sync testing
 #endif
