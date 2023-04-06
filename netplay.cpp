@@ -60,7 +60,7 @@ void net_advance_frame(uint16_t inputs[], int disconnect_flags)
    //    ngs.periodic = ngs.now;
    // }
 
-   audio_fast_forward = true;
+   // audio_fast_forward = true;
 
    core_run();
 
@@ -87,9 +87,9 @@ net_idle(int time)
 void
 net_run_frame()
 {
-  GGPOErrorCode result = GGPO_OK;
-  int disconnect_flags;
-  uint16_t inputs[MAX_CHARS] = { 0 };
+   GGPOErrorCode result = GGPO_OK;
+   int disconnect_flags;
+   uint16_t inputs[MAX_CHARS] = { 0 };
 
    if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
       input_poll();

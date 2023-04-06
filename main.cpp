@@ -139,12 +139,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	// glfwSwapInterval(g_cfg.swap_interval);
-	glfwSwapInterval(2);
+	glfwSwapInterval(0);
 
 	uint32_t start = Platform::GetCurrentTimeMS();
 	uint32_t next = start;
 	uint32_t now = start;
-	
+
 	while (!glfwWindowShouldClose(window)) {
 		now = Platform::GetCurrentTimeMS();
 		net_idle(max(0, next - now - 1));
