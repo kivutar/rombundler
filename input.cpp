@@ -218,7 +218,7 @@ uint16_t input_get_state(unsigned port) {
 void input_set_state(uint16_t input[]) {
 	int p = 0;
 	int i = 0;
-	for (p = 0; p < 2; p++) // TODO unhardcode 2 here
+	for (p = 0; p < 3; p++) // TODO unhardcode 3 here
 		for (i = 0; i < 16; i++)
 			state[p][i] = input[p] & (1 << i);
 }

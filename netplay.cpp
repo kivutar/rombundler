@@ -11,7 +11,7 @@
 
 GGPOSession *ggpo = NULL;
 NonGameState ngs = { 0 };
-#define MAX_CHARS 2
+#define MAX_CHARS 4
 extern config g_cfg;
 extern bool audio_fast_forward;
 
@@ -61,6 +61,7 @@ void net_advance_frame(uint16_t inputs[], int disconnect_flags)
    // }
 
    audio_fast_forward = ggpo_in_rollback(ggpo);
+   printf("audio_fast_forward: %d", audio_fast_forward);
 
    core_run();
 

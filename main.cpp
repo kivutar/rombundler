@@ -82,13 +82,10 @@ int main(int argc, char *argv[]) {
 	printf("pnum: %d\n", pnum);
 
 	int localport = 1234;
-	int remoteport = 1235;
-	if (pnum == 2) {
-		localport = 1235;
-		remoteport = 1234;
-	}
+	if (pnum == 2) localport = 1235;
+	else if (pnum == 3) localport = 1236;
 
-	int num_players = 2;
+	int num_players = 3;
 	int num_spectators = 0;
 	ngs.num_players = num_players;
 
@@ -99,8 +96,9 @@ int main(int argc, char *argv[]) {
 	ggpo_set_disconnect_timeout(ggpo, 3000);
 	ggpo_set_disconnect_notify_start(ggpo, 1000);
 
-	GGPOPlayer players[2] = { { 0 } };
-	if (pnum == 1) {
+	GGPOPlayer players[3] = { { 0 } };
+	switch (pnum) {
+	case 1: {
 		players[0].size = sizeof(GGPOPlayer);
 		players[0].player_num = 1;
 		players[0].type = GGPO_PLAYERTYPE_LOCAL;
@@ -108,18 +106,52 @@ int main(int argc, char *argv[]) {
 		players[1].size = sizeof(GGPOPlayer);
 		players[1].player_num = 2;
 		players[1].type = GGPO_PLAYERTYPE_REMOTE;
-		players[1].u.remote.port = remoteport;
+		players[1].u.remote.port = 1235;
 		strcpy(players[1].u.remote.ip_address, "127.0.0.1");
-	} else {
+
+		players[2].size = sizeof(GGPOPlayer);
+		players[2].player_num = 3;
+		players[2].type = GGPO_PLAYERTYPE_REMOTE;
+		players[2].u.remote.port = 1236;
+		strcpy(players[2].u.remote.ip_address, "127.0.0.1");
+	}
+	break;
+	case 2: {
+		players[0].size = sizeof(GGPOPlayer);
+		players[0].player_num = 1;
+		players[0].type = GGPO_PLAYERTYPE_REMOTE;
+		players[0].u.remote.port = 1234;
+		strcpy(players[0].u.remote.ip_address, "127.0.0.1");
+
 		players[1].size = sizeof(GGPOPlayer);
 		players[1].player_num = 2;
 		players[1].type = GGPO_PLAYERTYPE_LOCAL;
 
+		players[2].size = sizeof(GGPOPlayer);
+		players[2].player_num = 3;
+		players[2].type = GGPO_PLAYERTYPE_REMOTE;
+		players[2].u.remote.port = 1236;
+		strcpy(players[2].u.remote.ip_address, "127.0.0.1");
+	}
+	break;
+	case 3: {
 		players[0].size = sizeof(GGPOPlayer);
 		players[0].player_num = 1;
 		players[0].type = GGPO_PLAYERTYPE_REMOTE;
-		players[0].u.remote.port = remoteport;
+		players[0].u.remote.port = 1234;
 		strcpy(players[0].u.remote.ip_address, "127.0.0.1");
+
+		players[1].size = sizeof(GGPOPlayer);
+		players[1].player_num = 2;
+		players[1].type = GGPO_PLAYERTYPE_REMOTE;
+		players[1].u.remote.port = 1235;
+		strcpy(players[1].u.remote.ip_address, "127.0.0.1");
+
+		players[2].size = sizeof(GGPOPlayer);
+		players[2].player_num = 3;
+		players[2].type = GGPO_PLAYERTYPE_LOCAL;
+	}
+	break;
 	}
 
 	int i;
