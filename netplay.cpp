@@ -91,29 +91,29 @@ net_run_frame()
   int disconnect_flags;
   uint16_t inputs[MAX_CHARS] = { 0 };
 
-  if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
-     input_poll();
-     uint16_t input = input_get_state(0);
+   if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
+      input_poll();
+      uint16_t input = input_get_state(0);
 #if defined(SYNC_TEST)
-     input = rand(); // test: use random inputs to demonstrate sync testing
+      input = rand(); // test: use random inputs to demonstrate sync testing
 #endif
-     result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &input, sizeof(input));
-     printf("input: %d\n", result);
-  }
+      result = ggpo_add_local_input(ggpo, ngs.local_player_handle, &input, sizeof(input));
+      printf("input: %d\n", result);
+   }
 
    // synchronize these inputs with ggpo.  If we have enough input to proceed
    // ggpo will modify the input list with the correct inputs to use and
    // return 1.
-  if (GGPO_SUCCEEDED(result)) {
-     result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
-     if (GGPO_SUCCEEDED(result)) {
+   if (GGPO_SUCCEEDED(result)) {
+      result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
+      if (GGPO_SUCCEEDED(result)) {
          printf("SYNCED!!!\n");
          // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
          // the game by 1 frame using those inputs.
          net_advance_frame(inputs, disconnect_flags);
-     }
-  }
-  video_render();
+      }
+   }
+   video_render();
 }
 
 bool __cdecl
@@ -132,28 +132,12 @@ net_advance_frame_callback(int flags)
 bool __cdecl
 net_load_game_state_callback(unsigned char *buffer, int len)
 {
-   printf("net_load_game_state_callback len: %d\n", len);
-   // TODO call retro_unserialize
-   // memcpy(&gs, buffer, len);
-
-   core_unserialize(buffer, len);
-
-   return true;
+   return core_unserialize(buffer, len);
 }
 
 bool __cdecl
 net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, int frame)
 {
-   printf("net_save_game_state_callback\n");
-   // *len = sizeof(gs);
-   // *buffer = (unsigned char *)malloc(*len);
-   // if (!*buffer) {
-   //    return false;
-   // }
-   // // todo change this line
-   // memcpy(*buffer, &gs, *len);
-   // *checksum = fletcher32_checksum((short *)*buffer, *len / 2);
-
    *len = core_serialize_size();
    *buffer = (unsigned char *)malloc(*len);
    if (!*buffer)
@@ -171,7 +155,6 @@ net_save_game_state_callback(unsigned char **buffer, int *len, int *checksum, in
 void __cdecl 
 net_free_buffer(void *buffer)
 {
-   printf("net_free_buffer\n");
    free(buffer);
 }
 
@@ -179,7 +162,6 @@ bool __cdecl
 net_on_event_callback(GGPOEvent *info)
 {
    int progress;
-   printf("net_on_event_callback %d\n", info->code);
    switch (info->code) {
    case GGPO_EVENTCODE_CONNECTED_TO_PEER:
       ngs.SetConnectState(info->u.connected.player, Synchronizing);
