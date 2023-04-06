@@ -60,7 +60,7 @@ void net_advance_frame(uint16_t inputs[], int disconnect_flags)
    //    ngs.periodic = ngs.now;
    // }
 
-   // audio_fast_forward = true;
+   audio_fast_forward = ggpo_in_rollback(ggpo);
 
    core_run();
 
