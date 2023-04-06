@@ -66,10 +66,6 @@ int main(int argc, char *argv[]) {
 
 	glfwSetJoystickCallback(joystick_callback);
 
-	// core_load(g_cfg.core);
-	// core_load_game(g_cfg.rom);
-	// // srm_load();
-
 	GGPOErrorCode result;
 	
 	// Fill in a ggpo callbacks structure to pass to start_session.
@@ -82,11 +78,15 @@ int main(int argc, char *argv[]) {
 	cb.on_event        = net_on_event_callback;
 	cb.log_game_state  = net_log_game_state;
 
-	int localport = argc > 1 ? atoi(argv[1]) : 1234;
-	printf("localport: %d\n", localport);
+	int pnum = argc > 1 ? atoi(argv[1]) : 1;
+	printf("pnum: %d\n", pnum);
 
-	int remoteport = argc > 2 ? atoi(argv[2]) : 1235;
-	printf("remoteport: %d\n", remoteport);
+	int localport = 1234;
+	int remoteport = 1235;
+	if (pnum == 2) {
+		localport = 1235;
+		remoteport = 1234;
+	}
 
 	int num_players = 2;
 	int num_spectators = 0;
@@ -100,15 +100,27 @@ int main(int argc, char *argv[]) {
 	ggpo_set_disconnect_notify_start(ggpo, 1000);
 
 	GGPOPlayer players[2] = { { 0 } };
-	players[0].size = sizeof(GGPOPlayer);
-	players[0].player_num = 1;
-	players[0].type = GGPO_PLAYERTYPE_LOCAL;
+	if (pnum == 1) {
+		players[0].size = sizeof(GGPOPlayer);
+		players[0].player_num = 1;
+		players[0].type = GGPO_PLAYERTYPE_LOCAL;
 
-	players[0].size = sizeof(GGPOPlayer);
-	players[0].player_num = 2;
-	players[0].type = GGPO_PLAYERTYPE_REMOTE;
-	players[0].u.remote.port = remoteport;
-	strcpy(players[0].u.remote.ip_address, "127.0.0.1");
+		players[1].size = sizeof(GGPOPlayer);
+		players[1].player_num = 2;
+		players[1].type = GGPO_PLAYERTYPE_REMOTE;
+		players[1].u.remote.port = remoteport;
+		strcpy(players[1].u.remote.ip_address, "127.0.0.1");
+	} else {
+		players[1].size = sizeof(GGPOPlayer);
+		players[1].player_num = 2;
+		players[1].type = GGPO_PLAYERTYPE_LOCAL;
+
+		players[0].size = sizeof(GGPOPlayer);
+		players[0].player_num = 1;
+		players[0].type = GGPO_PLAYERTYPE_REMOTE;
+		players[0].u.remote.port = remoteport;
+		strcpy(players[0].u.remote.ip_address, "127.0.0.1");
+	}
 
 	int i;
 	for (i = 0; i < num_players + num_spectators; i++) {
@@ -126,7 +138,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	glfwSwapInterval(g_cfg.swap_interval);
+	// glfwSwapInterval(g_cfg.swap_interval);
+	glfwSwapInterval(2);
 
 	uint32_t start = Platform::GetCurrentTimeMS();
 	uint32_t next = start;
@@ -138,10 +151,6 @@ int main(int argc, char *argv[]) {
 		if (now >= next) {
 			glfwPollEvents();
 			net_run_frame();
-
-			// core_run();
-			// video_render();
-
 			glfwSwapBuffers(window);
 			next = now + (1000 / 60);
 		}

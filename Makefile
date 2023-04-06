@@ -22,8 +22,8 @@ endif
 
 INCFLAGS += -I. -Iinclude -Ideps/include
 INCFLAGS += -Iggpo/src/include -Iggpo/src/lib/ggpo -Iggpo/src/lib/ggpo/network -Iggpo/src/lib/ggpo/backends
-CFLAGS += -Wall -O3 -fPIC -flto 
-CXXFLAGS += -fno-rtti -fno-exceptions
+CXXFLAGS += -Wall -O3 -fPIC -flto
+CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11
 LDFLAGS += -lc++
 
 SOURCES_CXX = main.cpp \
@@ -58,16 +58,13 @@ OBJECTS := $(SOURCES_CXX:.cpp=.o)
 OBJECTS += $(SOURCES_C:.c=.o)
 
 %.o: %.cpp
-	$(CXX) -c -o $@ $< $(INCFLAGS) $(CFLAGS) $(CXXFLAGS)
-
-%.o: %.c
-	$(CC) -c -o $@ $<  $(INCFLAGS) $(CFLAGS) -flto
+	$(CXX) -c -o $@ $< $(INCFLAGS) $(CXXFLAGS)
 
 .PHONY: all clean
 
 all: $(TARGET)
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 bundle: $(TARGET)
 	mkdir -p ROMBundler-$(OS)-$(VERSION)

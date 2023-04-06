@@ -51,8 +51,6 @@ net_begin_game_callback(const char *name)
 
 void net_advance_frame(uint16_t inputs[], int disconnect_flags)
 {
-   printf("net_advance_frame");
-
    // gs.Update(inputs, disconnect_flags);
    input_set_state(inputs);
 
@@ -111,6 +109,7 @@ net_run_frame()
   if (GGPO_SUCCEEDED(result)) {
      result = ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
      if (GGPO_SUCCEEDED(result)) {
+         printf("SYNCED!!!\n");
          // inputs[0] and inputs[1] contain the inputs for p1 and p2.  Advance
          // the game by 1 frame using those inputs.
          net_advance_frame(inputs, disconnect_flags);
@@ -126,21 +125,17 @@ net_advance_frame_callback(int flags)
    uint16_t inputs[MAX_CHARS] = { 0 };
    int disconnect_flags;
 
-   // // Make sure we fetch new inputs from GGPO and use those to update
-   // // the game state instead of reading from the keyboard.
-   // ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(int) * MAX_SHIPS, &disconnect_flags);
-   // VectorWar_AdvanceFrame(inputs, disconnect_flags);
-
+   // Make sure we fetch new inputs from GGPO and use those to update
+   // the game state instead of reading from the keyboard.
    ggpo_synchronize_input(ggpo, (void *)inputs, sizeof(uint16_t) * MAX_CHARS, &disconnect_flags);
    net_advance_frame(inputs, disconnect_flags);
-
    return true;
 }
 
 bool __cdecl
 net_load_game_state_callback(unsigned char *buffer, int len)
 {
-   printf("net_load_game_state_callback\n");
+   printf("net_load_game_state_callback len: %d\n", len);
    // TODO call retro_unserialize
    // memcpy(&gs, buffer, len);
 
@@ -220,7 +215,6 @@ net_on_event_callback(GGPOEvent *info)
    }
    return true;
 }
-
 
 bool __cdecl
 net_log_game_state(char *filename, unsigned char *buffer, int len)
