@@ -198,7 +198,7 @@ struct keymap joy_binds[] = {
 };
 
 #define MAX_PLAYERS 5
-static int16_t state[MAX_PLAYERS][14] = {{0}};
+static int16_t state[MAX_PLAYERS][16] = {{0}};
 static int16_t analog_state[MAX_PLAYERS][2][2] = {{{0}}};
 static retro_keyboard_event_t key_event = NULL;
 extern GLFWwindow *window;
@@ -210,17 +210,17 @@ int16_t floatToAnalog(float v) {
 uint16_t input_get_state(unsigned port) {
 	uint16_t st = 0;
 	int i = 0;
-	for (i = 0; i < 14; i++)
+	for (i = 0; i < 16; i++)
 		st |= state[port][i] << i;
 	return st;
 }
 
 void input_set_state(uint16_t input[]) {
 	int p = 0;
-	int j = 0;
+	int i = 0;
 	for (p = 0; p < 2; p++) // TODO unhardcode 2 here
-		for (j = 0; j < 14; j++)
-			state[p][j] = input[p] & (1 << j);
+		for (i = 0; i < 16; i++)
+			state[p][i] = input[p] & (1 << i);
 }
 
 void input_poll(void) {

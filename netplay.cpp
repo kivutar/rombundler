@@ -40,8 +40,6 @@ fletcher32_checksum(short *data, size_t len)
 bool __cdecl
 net_begin_game_callback(const char *name)
 {
-   printf("net_begin_game_callback\n");
-
    core_load(g_cfg.core);
 	core_load_game(g_cfg.rom);
 	// srm_load();
@@ -121,7 +119,6 @@ net_run_frame()
 bool __cdecl
 net_advance_frame_callback(int flags)
 {
-   printf("net_advance_frame_callback\n");
    uint16_t inputs[MAX_CHARS] = { 0 };
    int disconnect_flags;
 
