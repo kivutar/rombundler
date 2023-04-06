@@ -170,8 +170,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	// glfwSwapInterval(g_cfg.swap_interval);
-	glfwSwapInterval(0);
+	glfwSwapInterval(g_cfg.swap_interval);
 
 	uint32_t start = Platform::GetCurrentTimeMS();
 	uint32_t next = start;

@@ -197,7 +197,7 @@ struct keymap joy_binds[] = {
 	{ GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, RETRO_DEVICE_ID_JOYPAD_R3 },
 };
 
-#define MAX_PLAYERS 5
+#define MAX_PLAYERS 4
 static int16_t state[MAX_PLAYERS][16] = {{0}};
 static int16_t analog_state[MAX_PLAYERS][2][2] = {{{0}}};
 static retro_keyboard_event_t key_event = NULL;
@@ -218,7 +218,7 @@ uint16_t input_get_state(unsigned port) {
 void input_set_state(uint16_t input[]) {
 	int p = 0;
 	int i = 0;
-	for (p = 0; p < 3; p++) // TODO unhardcode 3 here
+	for (p = 0; p < MAX_PLAYERS; p++)
 		for (i = 0; i < 16; i++)
 			state[p][i] = input[p] & (1 << i);
 }
