@@ -1,19 +1,28 @@
-image: ubuntu:latest
-
 stages:
   - build
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-before_script:
-  - apt-get update -q
-  - apt-get install -y build-essential libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev
-
 build_linux:
+  stage: build
+  before_script:
+    - apt-get update -q
+    - apt-get install -y build-essential libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev
+  script:
+    - make
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "kivutar/ci"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "kivutar/ci"'
+  tags:
+    - linux, ubuntu
+
+build_windows:
   stage: build
   script:
     - make
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "kivutar/ci"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "kivutar/ci"'
+  tags:
+    - windows
