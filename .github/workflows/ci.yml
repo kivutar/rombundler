@@ -46,4 +46,4 @@ jobs:
       - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/glfw3.dll .
       - run: echo "CXXFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L./lib" >> $GITHUB_ENV
-      - run: CC=gcc make
+      - run: OS=Windowys CXX=g++ make
