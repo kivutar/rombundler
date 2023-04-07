@@ -6,7 +6,7 @@ variables:
 
 build_linux:
   stage: build
-  image: 
+  image: ubuntu:latest
   before_script:
     - apt-get update -q
     - apt-get install -y build-essential libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev
