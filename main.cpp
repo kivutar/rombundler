@@ -88,6 +88,11 @@ int main(int argc, char *argv[]) {
 	int num_spectators = 0;
 	ngs.num_players = num_players;
 
+#if defined(_WIN32)
+	WSADATA wd = { 0 };
+	WSAStartup(MAKEWORD(2, 2), &wd);
+#endif
+
 	result = ggpo_start_session(&ggpo, &cb, "vectorwar", num_players, sizeof(uint16_t), localport);
 	if (result != GGPO_OK)
 		die("ggpo_start_session failed: %d\n", result);
@@ -234,5 +239,8 @@ int main(int argc, char *argv[]) {
 	video_deinit();
 
 	glfwTerminate();
+#ifdef _WIN32
+	WSACleanup();
+#endif
 	return 0;
 }
