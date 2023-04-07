@@ -3,11 +3,13 @@ VERSION ?= devel
 
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
+	CXXFLAGS += -D_WINDOWS
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
 	OS ?= Windows
 else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	TARGET := rombundler.exe
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
+	CXXFLAGS += -D_WINDOWS
 	OS ?= Windows
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
 	LDFLAGS := -Ldeps/osx_$(shell uname -m)/lib -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
@@ -44,7 +46,6 @@ SOURCES_CXX += ggpo/src/lib/ggpo/bitvector.cpp \
 	ggpo/src/lib/ggpo/input_queue.cpp \
 	ggpo/src/lib/ggpo/log.cpp \
 	ggpo/src/lib/ggpo/main.cpp \
-	ggpo/src/lib/ggpo/platform_unix.cpp \
 	ggpo/src/lib/ggpo/poll.cpp \
 	ggpo/src/lib/ggpo/sync.cpp \
 	ggpo/src/lib/ggpo/timesync.cpp \
@@ -53,6 +54,13 @@ SOURCES_CXX += ggpo/src/lib/ggpo/bitvector.cpp \
 	ggpo/src/lib/ggpo/network/udp_proto.cpp \
 	ggpo/src/lib/ggpo/backends/p2p.cpp \
 	ggpo/src/lib/ggpo/backends/spectator.cpp
+
+# on windows we need to add platform_windows.cpp to the list of sources
+ifeq ($(OS),Windows)
+	SOURCES_CXX += ggpo/src/lib/ggpo/platform_windows.cpp
+else
+	SOURCES_CXX += ggpo/src/lib/ggpo/platform_unix.cpp
+endif
 
 OBJECTS := $(SOURCES_CXX:.cpp=.o)
 OBJECTS += $(SOURCES_C:.c=.o)

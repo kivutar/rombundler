@@ -9,7 +9,11 @@
 #include <glad/glad.h>
 
 #include <ggponet.h>
-#include <platform_unix.h>
+#if defined(_WIN32)
+#  include "platform_windows.h"
+#else
+#  include "platform_unix.h"
+#endif
 
 #include "mappings.h"
 #include "config.h"

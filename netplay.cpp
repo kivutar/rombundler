@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ggponet.h>
-#include <platform_unix.h>
+#if defined(_WIN32)
+#  include "platform_windows.h"
+#else
+#  include "platform_unix.h"
+#endif
 #include "nongamestate.h"
 #include "core.h"
 #include "config.h"
