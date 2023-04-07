@@ -20,11 +20,11 @@ build_windows:
   stage: build
   before_script:
     - mkdir lib
-    - wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
+    - wget.exe --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
     - 7z x openal-soft-1.21.0-bin.zip -o/c/
     - cp /c/openal-soft-1.21.0-bin/libs/Win64/* ./lib
     - cp /c/openal-soft-1.21.0-bin/bin/Win64/soft_oal.dll OpenAL32.dll
-    - wget https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN64.zip
+    - wget.exe https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN64.zip
     - 7z x glfw-3.3.4.bin.WIN64.zip -o/c/
     - cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/libglfw3* ./lib
     - cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/glfw3.dll .
