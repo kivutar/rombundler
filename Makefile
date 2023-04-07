@@ -14,6 +14,7 @@ else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
 	LDFLAGS := -Ldeps/osx_$(shell uname -m)/lib -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit
 	LDFLAGS += -framework OpenAL
+	LDFLAGS += -lc++
 	OS ?= OSX
 else
 	LDFLAGS := -ldl
@@ -26,7 +27,6 @@ INCFLAGS += -I. -Iinclude -Ideps/include
 INCFLAGS += -Iggpo/src/include -Iggpo/src/lib/ggpo -Iggpo/src/lib/ggpo/network -Iggpo/src/lib/ggpo/backends
 CXXFLAGS += -Wall -O3 -fPIC -flto
 CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fpermissive
-LDFLAGS += -lc++
 
 SOURCES_CXX = main.cpp \
 	glad.cpp \
