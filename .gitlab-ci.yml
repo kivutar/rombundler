@@ -3,6 +3,9 @@ image: ubuntu:latest
 stages:
   - build
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 before_script:
   - apt-get update -q
   - apt-get install -y libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev
@@ -10,7 +13,6 @@ before_script:
 build_linux:
   stage: build
   script:
-    - git submodule update --init
     - make
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "kivutar/ci"'
