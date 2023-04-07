@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, kivutar/ggpo]
   pull_request:
-    branches: [master]
+    branches: [master, kivutar/ggpo]
 
 defaults:
   run:
@@ -38,6 +38,6 @@ jobs:
       - run: 7z x glfw-3.3.4.bin.WIN64.zip -o/c/
       - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/libglfw3* ./lib
       - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/glfw3.dll .
-      - run: echo "CFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
+      - run: echo "CXXFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L./lib" >> $GITHUB_ENV
       - run: CC=gcc make
