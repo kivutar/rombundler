@@ -4,11 +4,11 @@ VERSION ?= devel
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
 	CXXFLAGS += -D_WINDOWS
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
+	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows -lws2_32 -lwinmm
 	OS ?= Windows
 else ifneq ($(findstring MINGW,$(shell uname -s)),) # win
 	TARGET := rombundler.exe
-	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
+	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows -lws2_32 -lwinmm
 	CXXFLAGS += -D_WINDOWS
 	OS ?= Windows
 else ifneq ($(findstring Darwin,$(shell uname -s)),) # osx
