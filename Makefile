@@ -25,7 +25,7 @@ endif
 INCFLAGS += -I. -Iinclude -Ideps/include
 INCFLAGS += -Iggpo/src/include -Iggpo/src/lib/ggpo -Iggpo/src/lib/ggpo/network -Iggpo/src/lib/ggpo/backends
 CXXFLAGS += -Wall -O3 -fPIC -flto
-CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11
+CXXFLAGS += -fno-rtti -fno-exceptions -std=c++11 -fpermissive
 LDFLAGS += -lc++
 
 SOURCES_CXX = main.cpp \
