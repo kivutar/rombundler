@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
@@ -29,6 +31,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: OS=OSX VERSION=$VERSION make bundle
 
@@ -43,6 +47,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: choco install wget zip --ignore-checksums
       - run: mkdir lib
