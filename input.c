@@ -236,7 +236,7 @@ void input_poll(void) {
 		GLFWgamepadstate pad;
 		if (glfwGetGamepadState(port, &pad))
 		{
-			for (i = 0; i <= 14; i++)
+			for (i = 0; i < 14; i++)
 				state[port][joy_binds[i].rk] = pad.buttons[joy_binds[i].k];
 
 			analog_state[port][RETRO_DEVICE_INDEX_ANALOG_LEFT][RETRO_DEVICE_ID_ANALOG_X] = floatToAnalog(pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
