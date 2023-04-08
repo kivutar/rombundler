@@ -229,7 +229,10 @@ int main(int argc, char *argv[]) {
 			glfwPollEvents();
 			net_run_frame();
 			glfwSwapBuffers(window);
-			next = now + (1000 / 60);
+			// attempting to run the game at 120fps
+			// works well enough on Windows for now
+			// the game will still block on audio anyway
+			next = now + (1000 / 120);
 		}
 	}
 
