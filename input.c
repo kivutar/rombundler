@@ -249,10 +249,10 @@ void input_poll(void) {
 
 			if (g_cfg.map_analog_to_dpad)
 			{
-				state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
-				state[port][RETRO_DEVICE_ID_JOYPAD_RIGHT] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5;
-				state[port][RETRO_DEVICE_ID_JOYPAD_UP] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5;
-				state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] = pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_LEFT] |= pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_RIGHT] |= pad.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_UP] |= pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.5;
+				state[port][RETRO_DEVICE_ID_JOYPAD_DOWN] |= pad.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.5;
 			}
 		}
 	}
@@ -303,3 +303,4 @@ int16_t input_state(unsigned port, unsigned device, unsigned index, unsigned id)
 
 	return 0;
 }
+
