@@ -12,23 +12,27 @@ defaults:
 
 jobs:
   build_linux:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x86_64, arm64]
+    runs-on: ubuntu-22.04-${{ matrix.architecture }}  
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: make
 
+
   build_osx:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make
 
   build_windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: choco install wget --ignore-checksums
       - run: mkdir lib
       - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
