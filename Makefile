@@ -1,6 +1,11 @@
 TARGET := rombundler
 VERSION ?= devel
 
+ARCH := $(shell uname -m)
+ifeq ($(OS),Windows_NT)
+  ARCH := $(shell powershell -Command "(Get-WmiObject -Class Win32_Processor).Architecture")
+endif
+
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
@@ -40,7 +45,7 @@ bundle: $(TARGET)
 	cp config.ini ROMBundler-$(OS)-$(VERSION)
 	cp README.md ROMBundler-$(OS)-$(VERSION)
 	cp COPYING ROMBundler-$(OS)-$(VERSION)
-	zip -r ROMBundler-$(OS)-$(VERSION).zip ROMBundler-$(OS)-$(VERSION)
+	zip -r ROMBundler-$(OS)-$(VERSION)-$(ARCH).zip ROMBundler-$(OS)-$(VERSION)
 
 clean:
 	rm -rf $(OBJ) $(TARGET) ROMBundler-*
