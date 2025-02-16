@@ -1,10 +1,6 @@
 TARGET := rombundler
 VERSION ?= devel
-
 ARCH := $(shell uname -m)
-ifeq ($(OS),Windows_NT)
-  ARCH := $(shell powershell -Command "(Get-WmiObject -Class Win32_Processor).Architecture")
-endif
 
 ifeq ($(shell uname -s),) # win
 	TARGET := rombundler.exe
