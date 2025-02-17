@@ -37,7 +37,7 @@ $(TARGET): $(OBJ)
 
 bundle: $(TARGET)
 	mkdir -p ROMBundler-$(OS)-$(VERSION)-$(ARCH)
-	cp $(TARGET) ROMBundler-$(OS)-$(VERSION)
+	cp $(TARGET) ROMBundler-$(OS)-$(VERSION)-$(ARCH)
 	cp *.dll ROMBundler-$(OS)-$(VERSION)-$(ARCH) || :
 	cp config.ini ROMBundler-$(OS)-$(VERSION)-$(ARCH)
 	cp README.md ROMBundler-$(OS)-$(VERSION)-$(ARCH)
