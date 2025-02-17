@@ -24,7 +24,10 @@ jobs:
 
 
   build_osx:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        runner: [macos-latest, macos-16]
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
       - run: make
