@@ -36,13 +36,13 @@ $(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS) -flto
 
 bundle: $(TARGET)
-	mkdir -p ROMBundler-$(OS)-$(VERSION)
+	mkdir -p ROMBundler-$(OS)-$(VERSION)-$(ARCH)
 	cp $(TARGET) ROMBundler-$(OS)-$(VERSION)
-	cp *.dll ROMBundler-$(OS)-$(VERSION) || :
-	cp config.ini ROMBundler-$(OS)-$(VERSION)
-	cp README.md ROMBundler-$(OS)-$(VERSION)
-	cp COPYING ROMBundler-$(OS)-$(VERSION)
-	zip -r ROMBundler-$(OS)-$(VERSION)-$(ARCH).zip ROMBundler-$(OS)-$(VERSION)
+	cp *.dll ROMBundler-$(OS)-$(VERSION)-$(ARCH) || :
+	cp config.ini ROMBundler-$(OS)-$(VERSION)-$(ARCH)
+	cp README.md ROMBundler-$(OS)-$(VERSION)-$(ARCH)
+	cp COPYING ROMBundler-$(OS)-$(VERSION)-$(ARCH)
+	zip -r ROMBundler-$(OS)-$(VERSION)-$(ARCH).zip ROMBundler-$(OS)-$(VERSION)-$(ARCH)
 
 clean:
 	rm -rf $(OBJ) $(TARGET) ROMBundler-*
