@@ -31,7 +31,7 @@ jobs:
   build_osx:
     strategy:
       matrix:
-        runner: [macos-latest, macos-14-arm64]
+        runner: [macos-latest, macos-13]
     runs-on: ${{ matrix.runner }}
     steps: 
       - uses: actions/checkout@v4
