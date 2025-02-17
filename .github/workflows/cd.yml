@@ -32,8 +32,8 @@ jobs:
     strategy:
       matrix:
         runner: [macos-latest, macos-14]
-    runs-on: 
-    steps: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    steps: 
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: OS=OSX VERSION=$VERSION make bundle
