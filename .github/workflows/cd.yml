@@ -47,21 +47,22 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        architecture: [WIN32, WIN64]
+        architecture: [x86, x64]
     steps:
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
+      - run: echo "WARCH=${{ matrix.architecture == 'x86' && 'WIN32' || 'WIN64' }}" >> $GITHUB_ENV
       - run: choco install wget zip --ignore-checksums
       - run: mkdir lib
       - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.24.2-bin.zip
       - run: 7z x openal-soft-1.24.2-bin.zip -o/c/
-      - run: cp /c/openal-soft-1.24.2-bin/libs/${{ matrix.architecture }}/* ./lib
-      - run: cp /c/openal-soft-1.24.2-bin/bin/${{ matrix.architecture }}/soft_oal.dll OpenAL32.dll
-      - run: wget https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.${{ matrix.architecture }}.zip
-      - run: 7z x glfw-3.4.bin.${{ matrix.architecture }}.zip -o/c/
-      - run: cp /c/glfw-3.4.bin.${{ matrix.architecture }}/lib-mingw-w64/libglfw3* ./lib
-      - run: cp /c/glfw-3.4.bin.${{ matrix.architecture }}/lib-mingw-w64/glfw3.dll .
-      - run: echo "CFLAGS=-I\"/c/openal-soft-1.24.2-bin/include/\" -I\"/c/glfw-3.4.bin.${{ matrix.architecture }}/include/\"" >> $GITHUB_ENV
+      - run: cp /c/openal-soft-1.24.2-bin/libs/$WARCH/* ./lib
+      - run: cp /c/openal-soft-1.24.2-bin/bin/$WARCH/soft_oal.dll OpenAL32.dll
+      - run: wget https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.$WARCH.zip
+      - run: 7z x glfw-3.4.bin.$WARCH.zip -o/c/
+      - run: cp /c/glfw-3.4.bin.$WARCH/lib-mingw-w64/libglfw3* ./lib
+      - run: cp /c/glfw-3.4.bin.$WARCH/lib-mingw-w64/glfw3.dll .
+      - run: echo "CFLAGS=-I\"/c/openal-soft-1.24.2-bin/include/\" -I\"/c/glfw-3.4.bin.$WARCH/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L./lib" >> $GITHUB_ENV
       - run: OS=Windows VERSION=$VERSION CC=gcc make bundle
 
