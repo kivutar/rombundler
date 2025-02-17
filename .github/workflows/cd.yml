@@ -3,7 +3,6 @@ name: CD
 on:
   release:
     types: [created]
-  workflow_dispatch:
 
 defaults:
   run:
@@ -13,13 +12,13 @@ jobs:
   build_linux:
     strategy:
       matrix:
-        architecture: [x86_64, arm64]
-    runs-on: ubuntu-22.04-${{ matrix.architecture }}  
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}  
     steps:
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
-      - run: sudo apt-get update -q
-      - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
+      - run: sudo apt update -q
+      - run: sudo apt install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: OS=Linux VERSION=$VERSION make bundle
 
       - name: Upload Release Asset

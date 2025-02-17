@@ -5,7 +5,6 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-  workflow_dispatch:
 
 defaults:
   run:
@@ -15,12 +14,12 @@ jobs:
   build_linux:
     strategy:
       matrix:
-        runner: [ubuntu-22.04, ubuntu-22.04-arm]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.runner }}  
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update -q
-      - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
+      - run: sudo apt update -q
+      - run: sudo apt install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: make
 
 
