@@ -29,8 +29,11 @@ jobs:
           asset_paths: '["./ROMBundler-*.zip*"]'
 
   build_osx:
-    runs-on: macos-latest
-    steps:
+    strategy:
+      matrix:
+        runner: [macos-latest, macos-16]
+    runs-on: 
+    steps: ${{ matrix.runner }}
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: OS=OSX VERSION=$VERSION make bundle
