@@ -45,13 +45,10 @@ jobs:
 
   build_windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        architecture: [x86, x64]
     steps:
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
-      - run: echo "WARCH=${{ matrix.architecture == 'x86' && 'WIN32' || 'WIN64' }}" >> $GITHUB_ENV
+      - run: echo "WARCH=WIN64" >> $GITHUB_ENV
       - run: echo "OPENAL_VERSION=1.24.2" >> $GITHUB_ENV
       - run: echo "GLFW_VERSION=3.4" >> $GITHUB_ENV
       - run: choco install wget zip --ignore-checksums
