@@ -16,14 +16,14 @@ jobs:
         architecture: [x86_64, arm64]
     runs-on: ubuntu-22.04-${{ matrix.architecture }}  
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: sudo apt-get update -q
       - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: OS=Linux VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.2.2
+        uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -32,7 +32,7 @@ jobs:
   build_osx:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: OS=OSX VERSION=$VERSION make bundle
 
@@ -46,7 +46,7 @@ jobs:
   build_windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: choco install wget zip --ignore-checksums
       - run: mkdir lib
