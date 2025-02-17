@@ -63,7 +63,7 @@ jobs:
       - run: OS=Windows VERSION=$VERSION CC=gcc make bundle
 
       - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.2.2
+        uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
