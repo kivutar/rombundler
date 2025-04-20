@@ -10,30 +10,36 @@ defaults:
 
 jobs:
   build_linux:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}  
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
-      - run: sudo apt-get update -q
-      - run: sudo apt-get install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
+      - run: sudo apt update -q
+      - run: sudo apt install libopenal-dev xorg-dev libgl1-mesa-dev libglfw3-dev -y --allow-unauthenticated
       - run: OS=Linux VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.2.2
+        uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           asset_paths: '["./ROMBundler-*.zip*"]'
 
   build_osx:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
+    strategy:
+      matrix:
+        runner: [macos-latest, macos-13]
+    runs-on: ${{ matrix.runner }}
+    steps: 
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
       - run: OS=OSX VERSION=$VERSION make bundle
 
       - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.2.2
+        uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -42,24 +48,27 @@ jobs:
   build_windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
+      - run: echo "WARCH=WIN64" >> $GITHUB_ENV
+      - run: echo "OPENAL_VERSION=1.24.2" >> $GITHUB_ENV
+      - run: echo "GLFW_VERSION=3.4" >> $GITHUB_ENV
       - run: choco install wget zip --ignore-checksums
       - run: mkdir lib
-      - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip
-      - run: 7z x openal-soft-1.21.0-bin.zip -o/c/
-      - run: cp /c/openal-soft-1.21.0-bin/libs/Win64/* ./lib
-      - run: cp /c/openal-soft-1.21.0-bin/bin/Win64/soft_oal.dll OpenAL32.dll
-      - run: wget https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN64.zip
-      - run: 7z x glfw-3.3.4.bin.WIN64.zip -o/c/
-      - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/libglfw3* ./lib
-      - run: cp /c/glfw-3.3.4.bin.WIN64/lib-mingw-w64/glfw3.dll .
-      - run: echo "CFLAGS=-I\"/c/openal-soft-1.21.0-bin/include/\" -I\"/c/glfw-3.3.4.bin.WIN64/include/\"" >> $GITHUB_ENV
+      - run: wget --no-check-certificate http://www.openal-soft.org/openal-binaries/openal-soft-$OPENAL_VERSION-bin.zip
+      - run: 7z x openal-soft-$OPENAL_VERSION-bin.zip -o/c/
+      - run: cp /c/openal-soft-$OPENAL_VERSION-bin/libs/$WARCH/* ./lib
+      - run: cp /c/openal-soft-$OPENAL_VERSION-bin/bin/$WARCH/soft_oal.dll OpenAL32.dll
+      - run: wget https://github.com/glfw/glfw/releases/download/$GLFW_VERSION/glfw-$GLFW_VERSION.bin.$WARCH.zip
+      - run: 7z x glfw-$GLFW_VERSION.bin.$WARCH.zip -o/c/
+      - run: cp /c/glfw-$GLFW_VERSION.bin.$WARCH/lib-mingw-w64/libglfw3* ./lib
+      - run: cp /c/glfw-$GLFW_VERSION.bin.$WARCH/lib-mingw-w64/glfw3.dll .
+      - run: echo "CFLAGS=-I\"/c/openal-soft-$OPENAL_VERSION-bin/include/\" -I\"/c/glfw-$GLFW_VERSION.bin.$WARCH/include/\"" >> $GITHUB_ENV
       - run: echo "LDFLAGS=-L./lib" >> $GITHUB_ENV
       - run: OS=Windows VERSION=$VERSION CC=gcc make bundle
 
       - name: Upload Release Asset
-        uses: alexellis/upload-assets@0.2.2
+        uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
