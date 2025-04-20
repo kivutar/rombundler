@@ -18,7 +18,7 @@ See our Github Action config files for detailed instructions on how to setup dep
 
 To compile:
 
-```
+```shell
 make
 ```
 
@@ -27,18 +27,18 @@ make
 You don't need to compile `rombundler` if you just want to use it, you can get one of the binary releases [here](https://github.com/kivutar/rombundler/releases)
 
 Then modify the config.ini to fit your needs:
-
-    title = Shrine Maiden Shizuka Demo 2
-    core = ./blastem_libretro.dylib
-    rom = ./Shrine Maiden Shizuka Demo 2.md
-    swap_interval = 1
-    full_screen = false
-    hide_cursor = false
-    map_analog_to_dpad = true
-    window_width = 800
-    window_height = 600
-    aspect_ratio = 1.333333
-
+```ini
+title = Shrine Maiden Shizuka Demo 2
+core = ./blastem_libretro.dylib
+rom = ./Shrine Maiden Shizuka Demo 2.md
+swap_interval = 1
+full_screen = false
+hide_cursor = false
+map_analog_to_dpad = true
+window_width = 800
+window_height = 600
+aspect_ratio = 1.333333
+```
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
 For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. ROMBundler releases are for 64bit systems only for now.
@@ -53,12 +53,14 @@ You can then rename `rombundler` with the name of your game, change it's icon, a
 
 You can choose what kind of device is plugged in the console ports in the config.ini:
 
-    port0 = 3
-    port1 = 1
+```ini
+port0 = 3
+port1 = 1
+```
 
 The identifiers can be found in the libretro.h:
 
-```
+```cpp
 #define RETRO_DEVICE_NONE         0
 #define RETRO_DEVICE_JOYPAD       1
 #define RETRO_DEVICE_MOUSE        2
@@ -72,21 +74,26 @@ The identifiers can be found in the libretro.h:
 
 If you need special options for the emulator, you can set them by creating a options.ini file like this:
 
-    fceumm_sndvolume = 7
-    fceumm_palette = default
-    fceumm_ntsc_filter = composite
-
+```ini
+fceumm_sndvolume = 7
+fceumm_palette = default
+fceumm_ntsc_filter = composite
+```
 ## Shaders
 
 In the config.ini, you can specify a single pass shader. For example:
 
-    shader = zfast-crt
-    filter = linear
+```ini
+shader = zfast-crt
+filter = linear
+```
 
 Default values are
 
-    shader = default
-    filter = nearest
+```ini
+shader = default
+filter = nearest
+```
 
 For now available shaders are:
 
