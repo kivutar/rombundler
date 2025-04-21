@@ -5,7 +5,6 @@ UNAME_S := $(shell uname -s)
 ARCH    := $(shell uname -m)
 APP.DIR := $(APP)-$(ARCH).app
 
-
 ifeq ($(UNAME_S),) # win
 	TARGET := rombundler.exe
 	LDFLAGS += -L./lib -lglfw3dll -lOpenal32.dll -mwindows
