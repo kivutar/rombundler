@@ -36,7 +36,7 @@ jobs:
     steps: 
       - uses: actions/checkout@v4
       - run: echo "VERSION=$(echo ${{ github.event.release.tag_name }} | cut -c 2-)" >> $GITHUB_ENV
-      - run: OS=OSX VERSION=$VERSION make bundle
+      - run: OS=OSX VERSION=$VERSION make bundle ROMBundler.app
 
       - name: Upload Release Asset
         uses: alexellis/upload-assets@0.4.1

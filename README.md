@@ -1,3 +1,7 @@
+[![CI](https://github.com/humbertodias/rombundler/actions/workflows/ci.yml/badge.svg)](https://github.com/humbertodias/rombundler/actions/workflows/ci.yml)
+[![CD](https://github.com/humbertodias/rombundler/actions/workflows/cd.yml/badge.svg)](https://github.com/humbertodias/rombundler/actions/workflows/cd.yml)
+![GitHub all downloads](https://img.shields.io/github/downloads/humbertodias/rombundler/total)
+
 # ROMBundler
 
 ROMBundler is a way to release your homebrew retro game as an executable.
@@ -41,7 +45,8 @@ aspect_ratio = 1.333333
 ```
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
-For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. ROMBundler releases are for 64bit systems only for now.
+For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. 
+ROMBundler releases are for 32/64 bits and arm64.
 
 Place your ROM in the same folder. And set the ROM name in your config.ini.
 
@@ -105,7 +110,6 @@ We recommand using the linear filter with the CRT and LCD shaders.
 
 # TODO
 
- * Provide an OSX .app
  * Static linking for Linux
  * Switch full screen / windowed
  * Multitap option
