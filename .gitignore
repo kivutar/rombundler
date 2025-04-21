@@ -4,3 +4,5 @@ rombundler.exe
 ROMBundler*
 save.srm
 .vscode
+.DS_Store
+.idea
