@@ -41,7 +41,8 @@ aspect_ratio = 1.333333
 ```
 You can download libretro cores from http://buildbot.libretro.com/nightly/ and place it in the same folder, as well as your ROM. (But make sure to comply to the core license).
 
-For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. ROMBundler releases are for 64bit systems only for now.
+For Windows, the core need to be a `.DLL`, for OSX it needs to be a `.dylib`, and for Linux a `.so`. 
+ROMBundler releases are for 32/64 bits and arm64.
 
 Place your ROM in the same folder. And set the ROM name in your config.ini.
 
